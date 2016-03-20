@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.table.AbstractTableModel;
@@ -27,9 +28,12 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 	private JTable table;
 	private JPopupMenu popup;
 	private TrackTableModel model;
+	private ArrayList<ActionListener> listeners;
 	
 	TrackTable(TrackList list) {
 		super(new GridLayout(1,0));
+		
+		listeners = new ArrayList<ActionListener>();
 		
 		this.list = list;
 		list.addActionListener(this);
@@ -97,6 +101,7 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 	}
 
 	public void mousePressed(MouseEvent ev) {
+		updateListeners();
 		maybeShowPopup(ev);
 	}
 
@@ -110,6 +115,7 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 			int row = table.rowAtPoint(p);
 			ListSelectionModel model = table.getSelectionModel();
 			model.setSelectionInterval(row,row);
+			updateListeners();
 			if (table.getSelectedRow() != -1) {
 				popup.show(ev.getComponent(), ev.getX(), ev.getY());
 			}
@@ -152,6 +158,16 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 	
 	public int getSelectedIndex() {
 		return table.getSelectedRow();
+	}
+
+	public void subscribeForSelectionUpdates(ActionListener listener) {
+		listeners.add(listener);
+	}
+	
+	private void updateListeners() {
+		for (ActionListener listener : listeners) {
+			listener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "rowSelection"));
+		}
 	}
 }
 
