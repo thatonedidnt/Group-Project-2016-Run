@@ -6,7 +6,8 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MainMenuBar extends JMenuBar implements ActionListener{
-	//JMenuBar MenuBar;
+	private static final long serialVersionUID = -8709557995298923151L;
+	
 	JMenu menuFile, menuRecording;
 	JMenuItem itemOpen, itemNew, itemSaveAs, itemQuit;
 	JMenuItem itemNewTrack, itemCreateRecording, itemPreview, itemExport;
@@ -14,7 +15,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 
 	MainMenuBar(TrackList trackList){
 		super();
-		//MenuBar.add(Box.createRigidArea(new Dimension(100,25)));
 
 		menuFile=new JMenu("File");
 

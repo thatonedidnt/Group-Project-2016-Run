@@ -23,8 +23,8 @@ public class MainScreen extends JFrame implements ActionListener {
 		MainMenuBar menuBar = new MainMenuBar(tracklist);
 		mainFrame.setJMenuBar(menuBar);
 		TrackTablePane trackTablePane = new TrackTablePane(tracklist);
-		PicturePane picturePane = new PicturePane(tracklist);
-		JScrollPane rightPane = new JScrollPane(picturePane);
+		RightHalfPane righthalfpane = new RightHalfPane(tracklist);
+		JScrollPane rightPane = new JScrollPane(righthalfpane);
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, trackTablePane, rightPane);
 		mainFrame.add(splitPane);
 		

@@ -32,6 +32,8 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		try { 
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 
 		} catch (Exception ex) { }
+		this.setTitle("Editing track "+track.getShortFileName());
+		this.setIconImage(new ImageIcon(this.getClass().getResource("logo.png")).getImage());
 		
 		JPanel pane = new JPanel(new GridBagLayout());	
 		Border margin = new EmptyBorder(10,10,10,10);

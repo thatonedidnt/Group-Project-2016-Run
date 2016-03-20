@@ -192,6 +192,7 @@ public class Track implements Runnable
 	
 	public boolean getStartEnd()
 	{
+		if (this.getRelativeID() == 0) return Track.START;
 		return startEnd;
 	}
 	
@@ -285,5 +286,8 @@ public class Track implements Runnable
 		return (long)ret;
 	}
 
-	
+	public String getShortFileName() {
+		File file = new File(this.getFileName());
+		return file.getName();
+	}
 }

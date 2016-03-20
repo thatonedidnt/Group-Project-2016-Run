@@ -209,7 +209,7 @@ class TrackTableModel extends AbstractTableModel {
 	}
 	
 	private String formatFileName(int row) {
-		String filename = list.get(row).getFileName();
+		String filename = list.get(row).getShortFileName();
 		if (!list.get(row).isGood()) {
 			filename = "[Error] "+filename;
 		}
