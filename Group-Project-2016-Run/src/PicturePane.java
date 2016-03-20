@@ -26,20 +26,22 @@ public class PicturePane extends JPanel implements ActionListener, MouseListener
 	public void paintComponent(Graphics g) {
 		this.setSize(new Dimension((int)(list.totalLength()*PIXELS_PER_SECOND), list.numTracks()*IMAGE_HEIGHT + SCALE_SPACING));
 		g.setColor(Color.BLACK);
-		g.drawLine(0,SCALE_SPACING,this.getWidth(), SCALE_SPACING);
+		//g.drawLine(0,SCALE_SPACING,this.getWidth(), SCALE_SPACING);
 		int mark = 0;
 		while(mark<list.totalLength()) {
 			//g.drawLine(Integer.toString(mark), mark*PIXELS_PER_SECOND, 0, mark*PIXELS_PER_SECOND, SCALE_SPACING);
-			//g.drawString(mark,mark*PIXELS_PER_SECOND,SCALE_SPACING);
+			//g.drawString(mark,mark*PIXELS_PER_SECOND+23,SCALE_SPACING);
 			mark+=SCALE_INTERVAL;
 		}
 		
 		for (int i=0; i< list.numTracks(); i++) {
-			g.setColor(Color.BLUE);
+			g.setColor(new Color(100,100,255));
 			g.fillRect((int)(list.get(i).startTime()*PIXELS_PER_SECOND),
-					i*IMAGE_HEIGHT,
+					i*IMAGE_HEIGHT+23,
 					(int)(list.get(i).getLength()*PIXELS_PER_SECOND),
 					IMAGE_HEIGHT);
+			g.setColor(Color.BLACK);
+			g.drawString(list.get(i).getFileName(),(int)(list.get(i).startTime()*PIXELS_PER_SECOND),i*IMAGE_HEIGHT+42);
 			
 			/*
 			//Draws the left section of the track

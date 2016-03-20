@@ -157,7 +157,8 @@ public class Track implements Runnable
 	
 	public double getLength()
 	{
-		return length;
+		return 10;
+		//return length;
 	}
 	
 	public void setIntensity(double intensity)

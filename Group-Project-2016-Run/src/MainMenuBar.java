@@ -88,8 +88,6 @@ public class MainMenuBar implements ActionListener{
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
 				try {
-					System.out.println(file.getName());
-					System.out.println(file.getAbsolutePath());
 					tracklist.setFileName(file.getAbsolutePath());
 					this.enableButtons();
 				}

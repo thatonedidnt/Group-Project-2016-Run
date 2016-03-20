@@ -167,7 +167,6 @@ public class TrackList {
 	}
 	
 	public void save(String filename) throws BadPathException {
-		System.out.println(filename);
 		try {
 			DocumentBuilderFactory dBuilderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dBuilderFactory.newDocumentBuilder();
@@ -183,26 +182,26 @@ public class TrackList {
 				id.setValue(Integer.toString(track.getID()));
 				trackElement.setAttributeNode(id);
 				
-				Element filename_xml = script.createElement("filename_xml");
+				Element filename_xml = script.createElement("filename");
 				trackElement.appendChild(filename_xml);
 				filename_xml.appendChild(script.createTextNode(track.getFileName()));
 				trackElement.appendChild(filename_xml);
 				
-				Element relativeTo = script.createElement("relativeTo");
+				Element relativeTo = script.createElement("relativeto");
 				trackElement.appendChild(relativeTo);
-				String relativeToString = "";
-				if (track.getStartEnd() == Track.START) {
-					relativeToString = "start";
-				}
-				else {
-					relativeToString = "end";
-				}
-				relativeTo.appendChild(script.createTextNode(relativeToString));
+				relativeTo.appendChild(script.createTextNode(Integer.toString(track.getRelativeID())));
 				trackElement.appendChild(relativeTo);
 				
-				Element relativePosition = script.createElement("relativePosition");
+				Element relativePosition = script.createElement("relativeposition");
 				trackElement.appendChild(relativePosition);
-				relativePosition.appendChild(script.createTextNode(Double.toString(track.getIntensity())));
+				String relativePositionString = "";
+				if (track.getStartEnd() == Track.START) {
+					relativePositionString = "start";
+				}
+				else {
+					relativePositionString = "end";
+				}
+				relativePosition.appendChild(script.createTextNode(relativePositionString));
 				trackElement.appendChild(relativePosition);
 				
 				Element intensity = script.createElement("intensity");

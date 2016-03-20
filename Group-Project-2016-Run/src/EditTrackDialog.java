@@ -154,7 +154,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 				currentTrack.getRelativeID(),
 				currentTrack.getStartEnd(),
 				currentTrack.getID(),
-				null
+				list
 				);
 	}
 	private String[] getTrackNames(TrackList list){
