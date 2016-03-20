@@ -24,6 +24,7 @@ public class PicturePane extends JPanel implements ActionListener, MouseListener
 	}
 	 
 	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
 		this.setSize(new Dimension((int)(list.totalLength()*PIXELS_PER_SECOND), list.numTracks()*IMAGE_HEIGHT + SCALE_SPACING));
 		g.setColor(Color.BLACK);
 		//g.drawLine(0,SCALE_SPACING,this.getWidth(), SCALE_SPACING);
