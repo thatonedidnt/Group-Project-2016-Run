@@ -21,7 +21,7 @@ public class MainScreen extends JFrame implements ActionListener {
 		} catch (Exception ex) { }
 		
 		MainMenuBar menuBar = new MainMenuBar(tracklist);
-		mainFrame.setJMenuBar(menuBar.getMenuBar());
+		mainFrame.setJMenuBar(menuBar);
 		TrackTablePane trackTablePane = new TrackTablePane(tracklist);
 		PicturePane picturePane = new PicturePane(tracklist);
 		JScrollPane rightPane = new JScrollPane(picturePane);

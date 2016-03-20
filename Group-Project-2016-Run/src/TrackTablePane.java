@@ -50,8 +50,8 @@ public class TrackTablePane extends JPanel implements ActionListener {
 		updateEnable();
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
-		
 		if(e.getSource() == edit){
 			new EditTrackDialog(trackTable.getSelected(), tracklist);
 		}

@@ -22,7 +22,8 @@ public class PicturePane extends JPanel implements ActionListener, MouseListener
 	PicturePane (TrackList List) {
 		list = List;
 	}
-	 
+	
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		this.setSize(new Dimension((int)(list.totalLength()*PIXELS_PER_SECOND), list.numTracks()*IMAGE_HEIGHT + SCALE_SPACING));

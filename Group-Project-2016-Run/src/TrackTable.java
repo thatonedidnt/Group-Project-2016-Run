@@ -70,7 +70,7 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 	}
 	/*Creates a JTable reflecting the provided TrackList, adding this TrackTable to the TrackList’s ActionListeners. The format of the table is as in the storyboard, except with no Actions column.*/
 	
-	//TODO: IMPLEMENT
+	@Override
 	public void mouseClicked(MouseEvent ev) {
 		/*
 		Single click:
@@ -92,19 +92,23 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 		}
 	}
 
+	@Override
 	public void mouseEntered(MouseEvent ev) {
 		//do nothing
 	}
 
+	@Override
 	public void mouseExited(MouseEvent ev) {
 		//do nothing
 	}
 
+	@Override
 	public void mousePressed(MouseEvent ev) {
 		updateListeners();
 		maybeShowPopup(ev);
 	}
 
+	@Override
 	public void mouseReleased(MouseEvent ev) {
 		maybeShowPopup(ev);
 	}
@@ -122,6 +126,7 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 		}
 	}
 	
+	@Override
 	public void actionPerformed(ActionEvent ev) {
 		switch (ev.getActionCommand()) {
 		case "updateScript":
@@ -188,14 +193,17 @@ class TrackTableModel extends AbstractTableModel {
 		this.list = list;
 	}
 	
+	@Override
 	public String getColumnName(int col) {
 		return columnNames[col];
 	}
 	
+	@Override
 	public int getColumnCount() {
 		return 4;
 	}
 
+	@Override
 	public int getRowCount() {
 		return list.numTracks();
 	}
@@ -230,6 +238,7 @@ class TrackTableModel extends AbstractTableModel {
 		}
 	}
 	
+	@Override
 	public Object getValueAt(int row, int col) {
 		switch (col) {
 		case 0:

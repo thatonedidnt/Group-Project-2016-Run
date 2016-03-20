@@ -164,6 +164,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 				list
 				);
 	}
+	
 	private String[] getTrackNames(TrackList list){
 		String[] trackNames = new String[list.numTracks()+1];
 		trackNames[0] = "Start of Script";
@@ -172,6 +173,8 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		}
 		return trackNames;
 	}
+	
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == chooser){ 
 			 int returnVal = fc.showOpenDialog(EditTrackDialog.this);

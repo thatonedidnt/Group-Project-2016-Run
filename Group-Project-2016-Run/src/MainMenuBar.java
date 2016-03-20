@@ -5,15 +5,15 @@ import java.io.File;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class MainMenuBar implements ActionListener{
-	JMenuBar MenuBar;
+public class MainMenuBar extends JMenuBar implements ActionListener{
+	//JMenuBar MenuBar;
 	JMenu menuFile, menuRecording;
 	JMenuItem itemOpen, itemNew, itemSaveAs, itemQuit;
 	JMenuItem itemNewTrack, itemCreateRecording, itemPreview, itemExport;
 	TrackList tracklist;
 
 	MainMenuBar(TrackList trackList){
-		MenuBar=new JMenuBar();
+		super();
 		//MenuBar.add(Box.createRigidArea(new Dimension(100,25)));
 
 		menuFile=new JMenu("File");
@@ -60,8 +60,8 @@ public class MainMenuBar implements ActionListener{
 		itemExport.addActionListener(this);
 		menuRecording.add(itemExport);
 
-		MenuBar.add(menuFile);
-		MenuBar.add(menuRecording);
+		this.add(menuFile);
+		this.add(menuRecording);
 		
 		this.disableButtons();
 		
@@ -82,6 +82,7 @@ public class MainMenuBar implements ActionListener{
 		itemExport.setEnabled(true);
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == itemOpen){								//open
 			JFileChooser fc = new JFileChooser();
@@ -182,9 +183,5 @@ public class MainMenuBar implements ActionListener{
 				tracklist.export(file.getAbsolutePath());
 			}
 		}
-	}
-		
-	public JMenuBar getMenuBar() {
-		return MenuBar;
 	}
 }
