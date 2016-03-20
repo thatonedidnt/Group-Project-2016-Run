@@ -5,6 +5,7 @@ import java.io.*;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.border.*;
 
 public class EditTrackDialog extends JFrame implements ActionListener {
@@ -61,6 +62,9 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		pane.add(chooser, c);
 		
 		fc = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("WAV audio (*.wav)", "wav");
+		fc.addChoosableFileFilter(filter);
+		fc.setFileFilter(filter);
 		
 		JLabel relativeTrack = new JLabel ("Relative Track");
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -94,6 +98,9 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		if(track.getID() == list.get(0).getID())
 			end.setEnabled(false);
 		
+		beginning.setSelected(track.getStartEnd() == Track.START);
+		end.setSelected(!(track.getStartEnd() == Track.START));
+		
 	    ButtonGroup group = new ButtonGroup();
 	    group.add(beginning);
 	    group.add(end);
@@ -113,7 +120,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 				JSlider source = (JSlider)e.getSource();
 				if(!source.getValueIsAdjusting()){
 					double intensity = source.getValue();
-					currentTrack.setIntensity(intensity);
+					backUpTrack.setIntensity(intensity);
 				}
 			}
 		});

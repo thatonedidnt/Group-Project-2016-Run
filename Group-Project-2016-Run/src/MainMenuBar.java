@@ -3,6 +3,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class MainMenuBar implements ActionListener{
 	JMenuBar MenuBar;
@@ -84,7 +85,10 @@ public class MainMenuBar implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == itemOpen){								//open
 			JFileChooser fc = new JFileChooser();
-			int returnVal = fc.showDialog(itemOpen, "Open");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Script files (*.dbts, *.xml)", "dbts", "xml");
+			fc.addChoosableFileFilter(filter);
+			fc.setFileFilter(filter);
+			int returnVal = fc.showDialog(itemOpen, "Open...");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
 				try {
@@ -101,9 +105,15 @@ public class MainMenuBar implements ActionListener{
 		}
 		if(e.getSource() == itemNew){								//new
 			JFileChooser fc = new JFileChooser();
+			FileNameExtensionFilter dbtsfilter = new FileNameExtensionFilter("Script files (*.dbts)", "dbts");
+			fc.setFileFilter(dbtsfilter);
 			int returnVal = fc.showDialog(itemOpen, "New...");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
+				if (!file.getAbsolutePath().matches(".*[dD][bB][tT][sS]")) {
+					file = new File(file.getAbsolutePath()+".dbts");
+				}
+
 				String filename = file.getAbsolutePath();
 				try {
 					tracklist.clear();
@@ -120,17 +130,20 @@ public class MainMenuBar implements ActionListener{
 			}
 		}
 		if(e.getSource() == itemSaveAs){							//save as
-			if(e.getSource() == itemNew){
-				JFileChooser fc = new JFileChooser();
-				int returnVal = fc.showDialog(itemOpen, "Open");
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File file = fc.getSelectedFile();
-					try {
-						tracklist.save(file.getName());
-					}
-					catch (BadPathException e1) {
-						JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.");
-					}
+			JFileChooser fc = new JFileChooser();
+			FileNameExtensionFilter dbtsfilter = new FileNameExtensionFilter("Script files (*.dbts)", "dbts");
+			fc.setFileFilter(dbtsfilter);
+			int returnVal = fc.showDialog(itemOpen, "Save As...");
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				if (!file.getAbsolutePath().matches(".*[dD][bB][tT][sS]")) {
+					file = new File(file.getAbsolutePath()+".dbts");
+				}
+				try {
+					tracklist.save(file.getAbsolutePath());
+				}
+				catch (BadPathException e1) {
+					JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.");
 				}
 			}
 		}
@@ -139,6 +152,9 @@ public class MainMenuBar implements ActionListener{
 		}
 		if(e.getSource() == itemNewTrack){							//new track
 			JFileChooser fc = new JFileChooser();
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("WAV audio (*.wav)", "wav");
+			fc.addChoosableFileFilter(filter);
+			fc.setFileFilter(filter);
 			int returnVal = fc.showDialog(itemOpen, "Select audio file...");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
@@ -155,10 +171,15 @@ public class MainMenuBar implements ActionListener{
 		}
 		if(e.getSource() == itemExport){							//export
 			JFileChooser fc = new JFileChooser();
-			int returnVal = fc.showDialog(itemOpen, "Open");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("WAV audio", "wav");
+			fc.setFileFilter(filter);
+			int returnVal = fc.showDialog(itemOpen, "Export...");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
-				tracklist.export(file.getName());
+				if (!file.getAbsolutePath().matches(".*[wW][aA][vV]")) {
+					file = new File(file.getAbsolutePath()+".wav");
+				}
+				tracklist.export(file.getAbsolutePath());
 			}
 		}
 	}
