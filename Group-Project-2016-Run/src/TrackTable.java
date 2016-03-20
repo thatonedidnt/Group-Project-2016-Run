@@ -26,19 +26,23 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 	private TrackList list;
 	private JTable table;
 	private JPopupMenu popup;
+	private TrackTableModel model;
 	
 	TrackTable(TrackList list) {
 		super(new GridLayout(1,0));
 		
 		this.list = list;
+		list.addActionListener(this);
 		
 		try { 
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 
 		} catch (Exception ex) { 
 			ex.printStackTrace(); 
 		}
-
-		table = new JTable(new TrackTableModel(this.list));
+		
+		model = new TrackTableModel(this.list);
+		
+		table = new JTable(model);
 		table.setPreferredScrollableViewportSize(table.getPreferredSize());
 		table.setRowHeight(32);
 		table.setFillsViewportHeight(true);
@@ -115,17 +119,20 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 	public void actionPerformed(ActionEvent ev) {
 		switch (ev.getActionCommand()) {
 		case "updateScript":
-			this.invalidate();
+			model.fireTableDataChanged();
+			break;
 		case "Edit...":
 			if (table.getSelectedRow() != -1) {
 				new EditTrackDialog(list.get(table.getSelectedRow()), list);
 			}
+			break;
 		case "Delete":
 			if (table.getSelectedRow() != -1) {
 				if (DeleteTrackConfirmation.showDialog()) {
 					list.remove(table.getSelectedRow());
 				}
 			}
+			break;
 		}
 	}
 	

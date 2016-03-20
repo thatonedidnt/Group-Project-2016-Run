@@ -157,6 +157,7 @@ public class Track implements Runnable
 	
 	public double getLength()
 	{
+		//TODO: REMOVE DEBUGGING CODE
 		return 10;
 		//return length;
 	}
