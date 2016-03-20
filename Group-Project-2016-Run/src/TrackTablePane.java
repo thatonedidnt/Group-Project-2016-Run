@@ -1,13 +1,17 @@
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class TrackTablePane extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1172621669112000413L;
+	private static final int BOTTOM_SCALE_HEIGHT = 70;
 	
 	TrackTable trackTable;
 	JButton edit;
@@ -30,13 +34,20 @@ public class TrackTablePane extends JPanel implements ActionListener {
 		gbc.weighty = 1;
 		this.add(trackTable, gbc);
 		
+		gbc = new GridBagConstraints();
+		gbc.fill = GridBagConstraints.BOTH;
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 2;
+		this.add(Box.createRigidArea(new Dimension(0,BOTTOM_SCALE_HEIGHT)), gbc);
+		
 		edit = new JButton();
 		edit.setText("Edit...");
 		edit.addActionListener(this);
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.LINE_END;
 		gbc.gridx = 0;
-		gbc.gridy = 1;
+		gbc.gridy = 2;
 		this.add(edit, gbc);
 		
 		delete = new JButton();
@@ -45,7 +56,7 @@ public class TrackTablePane extends JPanel implements ActionListener {
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.LINE_START;
 		gbc.gridx = 1;
-		gbc.gridy = 1;
+		gbc.gridy = 2;
 		this.add(delete, gbc);
 		updateEnable();
 	}
@@ -68,5 +79,9 @@ public class TrackTablePane extends JPanel implements ActionListener {
 	private void updateEnable() {
 		edit.setEnabled(trackTable.getSelectedIndex() != -1);
 		delete.setEnabled(trackTable.getSelectedIndex() != -1);
+	}
+	
+	public JScrollPane getTrackTableScrollPane() {
+		return trackTable.getScrollPane();
 	}
 }

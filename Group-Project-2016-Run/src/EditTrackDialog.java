@@ -27,7 +27,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		backUpTrack = track;
 		currentTrack = track;
 		this.list = list;
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);	
+		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
 		this.setResizable(false);
 		try { 
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 
@@ -75,8 +75,9 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		pane.add(relativeTrack, c);
 		
 		
-		String[] tracks = getTrackNames(list);
+		String[] tracks = getTrackNames(list, currentTrack);
 		chooseTrack = new JComboBox<String>(tracks); 
+		chooseTrack.setSelectedIndex(mapIndexToComboList(list.getIndexByID(currentTrack.getRelativeID())));
 		chooseTrack.addActionListener(this);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 1;
@@ -117,6 +118,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		ISlider.setMajorTickSpacing(25);
 		ISlider.setPaintTicks(true);
 		ISlider.setPaintLabels(true);
+		ISlider.setValue((int)currentTrack.getIntensity());
 		ISlider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e){
 				JSlider source = (JSlider)e.getSource();
@@ -167,11 +169,21 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 				);
 	}
 	
-	private String[] getTrackNames(TrackList list){
-		String[] trackNames = new String[list.numTracks()+1];
+	private int mapIndexToComboList(int index) {
+		if (index + 1 > list.getIndexByID(currentTrack.getID())) return index;
+		return index + 1;
+	}
+	
+	private String[] getTrackNames(TrackList list, Track excludedTrack){
+		String[] trackNames = new String[list.numTracks()];
+		boolean skippedTrackAlready = false;
 		trackNames[0] = "Start of Script";
 		for(int i = 1; i<list.numTracks()+1; i++){
-			trackNames[i] = list.get(i-1).getFileName();
+			if (list.get(i-1) == excludedTrack) {
+				skippedTrackAlready = true;
+				continue;
+			}
+			trackNames[i + (skippedTrackAlready?-1:0)] = list.get(i-1).getFileName();
 		}
 		return trackNames;
 	}
@@ -198,6 +210,9 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 			}
 			else{
 				end.setEnabled(true);
+				if (relInd>list.getIndexByID(currentTrack.getID())) {
+					relInd = relInd + 1;
+				}
 				relativeTrack = list.get(relInd-1);
 				relativeID = relativeTrack.getID();
 				backUpTrack.setRelativeTo(relativeID);

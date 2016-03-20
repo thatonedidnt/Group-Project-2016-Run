@@ -1,3 +1,4 @@
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
@@ -7,6 +8,8 @@ public class MainScreen extends JFrame implements ActionListener {
 	
 	private JFrame mainFrame;
 	private TrackList list;
+	private JScrollPane rightPane;
+	private TrackTablePane trackTablePane;
 	
 	MainScreen(TrackList tracklist){
 		list = tracklist;
@@ -14,6 +17,8 @@ public class MainScreen extends JFrame implements ActionListener {
 		
 		mainFrame = new JFrame("[No file opened] - Dubbing Tool");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainFrame.setPreferredSize(new Dimension(800,600));
+		mainFrame.setMinimumSize(new Dimension(600,400));
 		mainFrame.setIconImage(new ImageIcon(this.getClass().getResource("logo.png")).getImage());
 		
 		try { 
@@ -22,11 +27,16 @@ public class MainScreen extends JFrame implements ActionListener {
 		
 		MainMenuBar menuBar = new MainMenuBar(tracklist);
 		mainFrame.setJMenuBar(menuBar);
-		TrackTablePane trackTablePane = new TrackTablePane(tracklist);
+		trackTablePane = new TrackTablePane(tracklist);
 		RightHalfPane righthalfpane = new RightHalfPane(tracklist);
-		JScrollPane rightPane = new JScrollPane(righthalfpane);
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, trackTablePane, rightPane);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, trackTablePane, righthalfpane);
 		mainFrame.add(splitPane);
+		
+		JScrollBar TrackTableVertBar = trackTablePane.getTrackTableScrollPane().getVerticalScrollBar();
+		JScrollBar PicturePaneVertBar = righthalfpane.getVertScrollPane().getVerticalScrollBar();
+		TrackTableVertBar.setModel(PicturePaneVertBar.getModel());
+		//timescalescroller.getVerticalScrollBar().setModel(((MainScreen)this.getParent()).getTrackTableScrollPane().getVerticalScrollBar().getModel());
+		
 		
 		mainFrame.pack();
 		mainFrame.setVisible(true);
@@ -44,5 +54,9 @@ public class MainScreen extends JFrame implements ActionListener {
 		if (ev.getActionCommand().equals("updateScript")) {
 			mainFrame.setTitle(list.getFileName()+" - Dubbing Tool");
 		}
+	}
+	
+	public JScrollPane getTrackTableScrollPane() {
+		return trackTablePane.getTrackTableScrollPane();
 	}
 }

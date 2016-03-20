@@ -36,7 +36,7 @@ public class Track implements Runnable
 	{
 		this.fileName = fileName;
 		intensity = 100;
-		ID = TrackList.nextID();
+		ID = tracklist.nextID();
 		relativeTo = 0;
 		startEnd = START;
 		this.tracklist = tracklist;
@@ -158,7 +158,7 @@ public class Track implements Runnable
 	public double getLength()
 	{
 		//TODO: REMOVE DEBUGGING CODE
-		return 10;
+		return 30;
 		//return length;
 	}
 	

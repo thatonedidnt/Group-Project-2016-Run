@@ -29,6 +29,7 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 	private JPopupMenu popup;
 	private TrackTableModel model;
 	private ArrayList<ActionListener> listeners;
+	private JScrollPane scrollpane;
 	
 	TrackTable(TrackList list) {
 		super(new GridLayout(1,0));
@@ -48,6 +49,7 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 		
 		table = new JTable(model);
 		table.setPreferredScrollableViewportSize(table.getPreferredSize());
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.setRowHeight(32);
 		table.setFillsViewportHeight(true);
 		table.addMouseListener(this);
@@ -62,11 +64,11 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 		popup.add(edit);
 		popup.add(delete);
 		
-		JScrollPane scrollPane = new JScrollPane(table);
+		scrollpane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		this.setLayout(new BorderLayout());
 		
-		add(scrollPane, BorderLayout.CENTER);
+		add(scrollpane, BorderLayout.CENTER);
 	}
 	/*Creates a JTable reflecting the provided TrackList, adding this TrackTable to the TrackList’s ActionListeners. The format of the table is as in the storyboard, except with no Actions column.*/
 	
@@ -174,6 +176,10 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 			listener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "rowSelection"));
 		}
 	}
+	
+	public JScrollPane getScrollPane() {
+		return scrollpane;
+	}
 }
 
 class TrackTableModel extends AbstractTableModel {
@@ -231,7 +237,7 @@ class TrackTableModel extends AbstractTableModel {
 			int ID = list.get(row).getRelativeID();
 			for (Track track : list.getTracks()) {
 				if (track.getID() == ID) {
-					return startend+track.getFileName();
+					return startend+track.getShortFileName();
 				}
 			}
 			return "Track not found.";
