@@ -2,14 +2,14 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.*;
 import javax.swing.border.*;
 
 public class EditTrackDialog extends JFrame implements ActionListener {
+	private static final long serialVersionUID = 1870545754361816765L;
+	
 	private Track currentTrack;
 	private Track backUpTrack;
 	private Track relativeTrack;
@@ -17,7 +17,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 	private int relativeID;
 	private JButton chooser, preview, save, cancel;
 	private JRadioButton beginning, end;
-	private JComboBox chooseTrack;
+	private JComboBox<String> chooseTrack;
 	private JTextField text;
 	private JFileChooser fc;
 	private JSlider ISlider;

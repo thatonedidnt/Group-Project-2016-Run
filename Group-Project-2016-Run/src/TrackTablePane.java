@@ -6,6 +6,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 public class TrackTablePane extends JPanel implements ActionListener {
+	private static final long serialVersionUID = 1172621669112000413L;
 	
 	TrackTable trackTable;
 	JButton edit;
@@ -22,7 +23,7 @@ public class TrackTablePane extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		
 		if(e.getSource() == edit){
-			EditTrackDialog etd = new EditTrackDialog(trackTable.getSelected(), tracklist);
+			new EditTrackDialog(trackTable.getSelected(), tracklist);
 		}
 		
 		if(e.getSource() == delete){

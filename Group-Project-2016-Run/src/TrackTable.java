@@ -1,5 +1,4 @@
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -22,6 +21,8 @@ import javax.swing.UIManager;
 
 
 public class TrackTable extends JPanel implements ActionListener, MouseListener {
+	private static final long serialVersionUID = -4739904494588317823L;
+	
 	private TrackList list;
 	private JTable table;
 	private JPopupMenu popup;

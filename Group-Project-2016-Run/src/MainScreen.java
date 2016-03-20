@@ -1,8 +1,8 @@
-import java.awt.Dimension;
-
 import javax.swing.*;
+
 public class MainScreen extends JFrame{
-	private TrackList tracklist;
+	private static final long serialVersionUID = -5747885815904079529L;
+	
 	MainScreen(TrackList tracklist){
 		
 		JFrame mainFrame = new JFrame("[No file opened] - Dubbing Tool");
@@ -12,7 +12,6 @@ public class MainScreen extends JFrame{
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 
 		} catch (Exception ex) { }
 		
-		this.tracklist = tracklist;
 		MainMenuBar menuBar = new MainMenuBar(tracklist);
 		mainFrame.setJMenuBar(menuBar.getMenuBar());
 		TrackTablePane trackTablePane = new TrackTablePane(tracklist);
@@ -27,6 +26,6 @@ public class MainScreen extends JFrame{
 	}
 	public static void main(String[] a){
 		TrackList list = new TrackList();
-		MainScreen screen = new MainScreen(list);
+		new MainScreen(list);
 	}
 }

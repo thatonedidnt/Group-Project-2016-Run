@@ -4,16 +4,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.Image;
 
 public class PicturePane extends JPanel implements ActionListener, MouseListener {
 
+	private static final long serialVersionUID = -562341342997159884L;
+	
 	private TrackList list;
 	//private ImageIcon leftTrack = new ImageIcon(this.getClass().getResource("GraphicsElementLeft.png"));
 	//private ImageIcon rightTrack = new ImageIcon(this.getClass().getResource("GraphicsElementRight.png"));
 	//private ImageIcon centerTrack = new ImageIcon(this.getClass().getResource("GraphicsElementCenter.png"));
 	private static final int SCALE_SPACING = 15;
-	private static final int SIDE_WIDTH = 10;
+	//private static final int SIDE_WIDTH = 10;
 	private static final int IMAGE_HEIGHT = 32;
 	private static final int PIXELS_PER_SECOND = 5;
 	private static final int SCALE_INTERVAL = 5;
@@ -76,7 +77,7 @@ public class PicturePane extends JPanel implements ActionListener, MouseListener
 			int start = (int)(list.get(tracknum).startTime() * PIXELS_PER_SECOND);
 			int end = (int)(start + list.get(tracknum).getLength() * PIXELS_PER_SECOND);
 			if (x>=start && x<=end) {
-				EditTrackDialog eTD= new EditTrackDialog(list.get(tracknum), list); 
+				new EditTrackDialog(list.get(tracknum), list); 
 			}
 		}
 	}
