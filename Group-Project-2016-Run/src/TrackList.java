@@ -345,4 +345,13 @@ public class TrackList {
 		tracks = new ArrayList<Track>();
 		updateActionListeners();
 	}
+	
+	public int getIndexByID(int ID) {
+		for (int i = 0; i < this.numTracks(); ++i) {
+			if (this.get(i).getID() == ID) {
+				return i;
+			}
+		}
+		return -1;
+	}
 }

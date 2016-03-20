@@ -30,7 +30,7 @@ public class PictureTimeScalePane extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent ev) {
 		if (ev.getActionCommand().equals("updateScript")) {
-			repaint();
+			revalidate();
 		}
 	}
 }

@@ -116,7 +116,7 @@ public class PicturePane extends JPanel implements ActionListener, MouseListener
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals("updateScript")) {
-			repaint();
+			revalidate();
 		}
 	}
 

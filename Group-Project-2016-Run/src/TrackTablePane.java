@@ -56,7 +56,9 @@ public class TrackTablePane extends JPanel implements ActionListener {
 			new EditTrackDialog(trackTable.getSelected(), tracklist);
 		}
 		if(e.getSource() == delete){
-			tracklist.remove(trackTable.getSelectedIndex());
+			if (DeleteTrackConfirmation.showDialog()) {
+				tracklist.remove(trackTable.getSelectedIndex());
+			}
 		}
 		if (e.getSource() == trackTable) {
 			updateEnable();

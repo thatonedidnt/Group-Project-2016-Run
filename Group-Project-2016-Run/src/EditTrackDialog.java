@@ -97,7 +97,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		c.gridy = 1;
 		pane.add(end, c);
 		
-		if(track.getID() == list.get(0).getID())
+		if(track.getRelativeID() == 0)
 			end.setEnabled(false);
 		
 		beginning.setSelected(track.getStartEnd() == Track.START);
@@ -190,8 +190,12 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		}
 		if(e.getSource() == chooseTrack){ 
 			int relInd = chooseTrack.getSelectedIndex();
-			if(relInd == 0)
+			if(relInd == 0) {
 				backUpTrack.setRelativeTo(0);
+				end.setEnabled(false);
+				beginning.setSelected(true);
+				end.setSelected(false);
+			}
 			else{
 				end.setEnabled(true);
 				relativeTrack = list.get(relInd-1);

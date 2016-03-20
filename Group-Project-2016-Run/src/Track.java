@@ -203,9 +203,10 @@ public class Track implements Runnable
 	
 	public double startTime()
 	{
+		System.out.println("ID: "+ID+" rel: "+relativeTo);
 		if(relativeTo == 0)
 			return 0;
-		Track relativeTrack = tracklist.get(relativeTo);
+		Track relativeTrack = tracklist.get(tracklist.getIndexByID(relativeTo));
 		double relativeTime = relativeTrack.startTime();
 		if(startEnd == START) //relative to beginning
 			return relativeTime;
