@@ -141,8 +141,14 @@ public class TrackList {
 	
 	public void play() 
 	{
-		if(failedTracks().size() > 0)
+		if(failedTracks().size() > 0) {
+			ArrayList<String> failedFilenames = new ArrayList<String>();
+			for (Track track : this.failedTracks()) {
+				failedFilenames.add(track.getFileName());
+			}
+			new FileNotFound(failedFilenames);
 			return;
+		}
 		long currentTime = System.currentTimeMillis();
 		
 		
