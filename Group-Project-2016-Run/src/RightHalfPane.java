@@ -31,7 +31,7 @@ public class RightHalfPane extends JPanel implements ActionListener {
 		this.add(Box.createRigidArea(new Dimension(0,PicturePane.FIRST_ROW_OFFSET)), gbc);
 		
 		PicturePane picpane = new PicturePane(tracklist);
-		vertScroll = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		vertScroll = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		vertScroll.setViewportView(picpane);
 		gbc = new GridBagConstraints();
 		gbc.fill = GridBagConstraints.BOTH;
@@ -42,9 +42,10 @@ public class RightHalfPane extends JPanel implements ActionListener {
 		gbc.weighty = 1;
 		this.add(vertScroll, gbc);
 		
-		PictureTimeScalePane timescale = new PictureTimeScalePane(tracklist);
-		horizScroll = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		PictureTimeScalePane timescale = new PictureTimeScalePane(tracklist, picpane);
+		horizScroll = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		horizScroll.setViewportView(timescale);
+		horizScroll.setMinimumSize(new Dimension(1,62));
 		//horizScroll.setPreferredSize(new Dimension(99999,60));
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.LINE_START;
@@ -76,7 +77,7 @@ public class RightHalfPane extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent ev) {
 		if (ev.getActionCommand().equals("updateScript")) {
-			this.revalidate();
+			//this.revalidate();
 			this.getParent().getParent().revalidate();
 		}
 	}

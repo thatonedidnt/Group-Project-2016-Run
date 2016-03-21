@@ -93,7 +93,8 @@ public class Track implements Runnable
 		fileName = "";
 		length = -1;
 		lengthInSamples = -1;
-		relativeTo = Track.TRACK_BEGINNING;
+		relativeTo = TRACK_BEGINNING;
+		ID = tracklist.nextID();
 		startEnd = START;
 		intensity = 100;
 		isGood = true;

@@ -8,7 +8,6 @@ public class MainScreen extends JFrame implements ActionListener {
 	
 	private JFrame mainFrame;
 	private TrackList list;
-	private JScrollPane rightPane;
 	private TrackTablePane trackTablePane;
 	
 	MainScreen(TrackList tracklist){

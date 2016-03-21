@@ -14,13 +14,11 @@ public class PictureTimeScalePane extends JPanel implements ActionListener, Scro
 	private static final long serialVersionUID = 9145548790046344469L;
 	
 	private TrackList tracklist;
+	private JPanel picpane;
 	
-	PictureTimeScalePane(TrackList tracklist) {
-		/*
-		this.setSize(new Dimension(2, 60));
-		this.setPreferredSize(new Dimension(2, 60));
-		*/
+	PictureTimeScalePane(TrackList tracklist, JPanel picpane) {
 		this.tracklist = tracklist;
+		this.picpane = picpane;
 		tracklist.addActionListener(this);
 		this.repaint();
 	}
@@ -33,10 +31,7 @@ public class PictureTimeScalePane extends JPanel implements ActionListener, Scro
 				RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 		
 		int totalLength = (int)(tracklist.totalLength()*PicturePane.PIXELS_PER_SECOND);
-		/*
-		this.setSize(new Dimension(totalLength, 60));
-		this.setPreferredSize(new Dimension(totalLength, 60));
-		*/
+		
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, totalLength, 2);
 		for (int i = 5; i < totalLength/PicturePane.PIXELS_PER_SECOND; i += 5) {
@@ -48,19 +43,15 @@ public class PictureTimeScalePane extends JPanel implements ActionListener, Scro
 	@Override
 	public void actionPerformed(ActionEvent ev) {
 		if (ev.getActionCommand().equals("updateScript")) {
-			//int totalLength = (int)(tracklist.totalLength()*PicturePane.PIXELS_PER_SECOND);
-			int totalLength = 999999;
-			this.setSize(new Dimension(totalLength, 60));
-			this.setPreferredSize(new Dimension(totalLength, 60));
-			revalidate();
+			this.revalidate();
 			this.getParent().getParent().repaint();
 		}
 	}
 
 	@Override
 	public Dimension getPreferredScrollableViewportSize() {
-		int totalLength = (int)(tracklist.totalLength()*PicturePane.PIXELS_PER_SECOND);
-		return new Dimension(totalLength, 60);
+		//int totalLength = (int)(tracklist.totalLength()*PicturePane.PIXELS_PER_SECOND);
+		return new Dimension(picpane.getWidth(), 60);
 	}
 
 	@Override
@@ -81,5 +72,10 @@ public class PictureTimeScalePane extends JPanel implements ActionListener, Scro
 	@Override
 	public int getScrollableUnitIncrement(Rectangle arg0, int arg1, int arg2) {
 		return 5;
+	}
+	
+	@Override
+	public Dimension getPreferredSize() {
+		return new Dimension(picpane.getWidth(), 60);
 	}
 }

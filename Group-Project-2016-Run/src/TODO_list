@@ -1,12 +1,12 @@
 TODOs for AOOD group project:
 Done, needs testing: Add the "Edit" and "Delete" buttons on TrackTablePane
-	Add the time scale for PicturePane, and align it with TrackTablePane
-Done, needs some calibration and testing: Make vertical scrollbar and link it
-	Make horizontal scrollbar and link it
+Done, needs testing: Add the time scale for PicturePane, and align it with TrackTablePane
+Done, needs testing: Make vertical scrollbar and link it
+Done, needs testing: Make horizontal scrollbar and link it
 Done, needs testing: Fix startTime() problem
 	Find out how to prevent loops in relative IDs
 	Handle removal correctly
-Done, Needs testing: Update all JFileChoosers to only select certain file types
+Done, needs testing: Update all JFileChoosers to only select certain file types
 Done, needs testing: Make the PicturePane repaint itself when things change
 Apparently should be fixed when sound works: Make sensible defaults in Track
 Done, needs testing: When EditTrackDialog opens, make the selected values mirror the already existing ones
