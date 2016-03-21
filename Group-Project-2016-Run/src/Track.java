@@ -265,7 +265,12 @@ public class Track implements Runnable
 	
 	public AudioFormat getFormat()
 	{
-		return dataStream.getFormat();
+		if (dataStream != null) {
+			return dataStream.getFormat();
+		}
+		else {
+			return new AudioFormat(8000,8,1,false,false);
+		}
 	}
 	
 	public long getLengthInSamples()
