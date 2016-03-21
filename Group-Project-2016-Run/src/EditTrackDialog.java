@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -18,7 +19,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 	private int relativeID;
 	private JButton chooser, preview, save, cancel;
 	private JRadioButton beginning, end;
-	private JComboBox<String> chooseTrack;
+	private JComboBox<Track> chooseTrack;
 	private JTextField text;
 	private JFileChooser fc;
 	private JSlider ISlider;
@@ -74,9 +75,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		c.gridy = 1;
 		pane.add(relativeTrack, c);
 		
-		
-		String[] tracks = getTrackNames(list, currentTrack);
-		chooseTrack = new JComboBox<String>(tracks); 
+		chooseTrack = new JComboBox<Track>(list.getTracks().toArray(new Track[0])); 
 		chooseTrack.setSelectedIndex(mapIndexToComboList(list.getIndexByID(currentTrack.getRelativeID())));
 		chooseTrack.addActionListener(this);
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -172,20 +171,6 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 	private int mapIndexToComboList(int index) {
 		if (index + 1 > list.getIndexByID(currentTrack.getID())) return index;
 		return index + 1;
-	}
-	
-	private String[] getTrackNames(TrackList list, Track excludedTrack){
-		String[] trackNames = new String[list.numTracks()];
-		boolean skippedTrackAlready = false;
-		trackNames[0] = "Start of Script";
-		for(int i = 1; i<list.numTracks()+1; i++){
-			if (list.get(i-1) == excludedTrack) {
-				skippedTrackAlready = true;
-				continue;
-			}
-			trackNames[i + (skippedTrackAlready?-1:0)] = list.get(i-1).getFileName();
-		}
-		return trackNames;
 	}
 	
 	@Override
