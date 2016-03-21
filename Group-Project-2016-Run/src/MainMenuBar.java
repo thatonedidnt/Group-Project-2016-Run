@@ -180,7 +180,14 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 				if (!file.getAbsolutePath().matches(".*[wW][aA][vV]")) {
 					file = new File(file.getAbsolutePath()+".wav");
 				}
-				tracklist.export(file.getAbsolutePath());
+				try
+				{
+					tracklist.export(file.getAbsolutePath());
+				}
+				catch(BadPathException ex)
+				{
+					JOptionPane.showMessageDialog(null, "The path for exporting the script isn't accessible.");
+				}
 			}
 		}
 	}

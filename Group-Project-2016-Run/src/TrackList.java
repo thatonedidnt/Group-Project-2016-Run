@@ -1,11 +1,19 @@
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.*;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -15,18 +23,106 @@ import javax.xml.transform.stream.StreamResult;
 
 import java.io.*;
 
-public class TrackList {
+class ClippingInputStream extends AudioInputStream
+{
+	private long sampleLength;
+	private List<Long> frameStartList;
+	private List<Track> trackList;
+	private long curSample;
+	private AudioFormat fmt;
 	
+	public ClippingInputStream(TrackList t) 
+	{
+		super(null, t.getTrackListFormat(), 0);
+		sampleLength = t.totalLengthInSamples();
+		frameStartList = new ArrayList<Long>();
+		trackList = new ArrayList<Track>();
+		fmt = t.getTrackListFormat();
+		
+		for(int a=0;a<t.numTracks();a++)
+		{
+			trackList.add(t.get(a));
+			frameStartList.add(t.get(a).startSample());
+		}
+	}
+	
+	
+	@Override
+	public long getFrameLength()
+	{
+		return sampleLength;
+	}
+	
+	public int read(byte[] buffer, int off, int len) throws IOException
+	{
+		int[] byteSums = new int[len];
+		byte[] singleRead = new byte[len];
+		int totalReads = 0;
+		int maxLen = 0;
+		for(int a=0;a<trackList.size();a++)
+		{
+			Track t = trackList.get(a);
+			if(t.startSample() < (curSample + len) && curSample < t.startSample() + t.getLengthInSamples())
+			{
+				totalReads++;
+				long samplesToRead;
+				int offset = 0;
+				if(curSample < t.startSample())
+				{
+					samplesToRead = (curSample + len) - t.startSample();
+					offset = (int)(t.startSample() - curSample);
+				}
+				else if((curSample + len) > (t.startSample() + t.getLengthInSamples()))
+				{
+					samplesToRead = (t.startSample() + t.getLengthInSamples()) - (curSample);
+				}
+				else
+				{
+					samplesToRead = len;
+				}
+				t.getDataStream().read(singleRead, offset, (int)samplesToRead);
+				System.out.println(singleRead[0]);
+				for(int b=offset;b<len;b++)
+				{
+					byteSums[b] += singleRead[b - offset];
+				}
+				maxLen = Math.max((int)samplesToRead, maxLen);
+			}
+		}
+		for(int a=0;a<len;a++)
+		{
+			buffer[a] = (byte)(byteSums[a]);
+		}
+		curSample += (len / (fmt.getFrameSize()));
+		if(totalReads == 0)
+			return -1;
+		else
+			return maxLen;
+	}
+}
+
+
+
+
+
+
+public class TrackList implements Runnable
+{
+
 	private ArrayList<Track> tracks;
 	private ArrayList<ActionListener> actionlisteners;
 	private String fileName;
-	
+
 	private AudioFormat format;
-	
-	TrackList() {
+	private static int currentID = 1;
+
+	private volatile boolean terminateSound;
+
+	public TrackList() {
 		format = null;
 		tracks = new ArrayList<Track>();
 		actionlisteners = new ArrayList<ActionListener>();
+		format = new AudioFormat(44100, 16, 2, true, false);
 	}
 
 	/*
@@ -49,7 +145,7 @@ public class TrackList {
 						String relativeTo = element.getElementsByTagName("relativeto").item(0).getTextContent();
 						String relativePos = element.getElementsByTagName("relativeposition").item(0).getTextContent();
 						String intensity = element.getElementsByTagName("intensity").item(0).getTextContent();
-						
+
 						boolean startend = false;
 						if (relativePos.equals("start")) {
 							startend = Track.START;
@@ -82,45 +178,49 @@ public class TrackList {
 			throw new BadPathException();
 		}
 		format = getHighestQualityFormat();
-		
+
 		int highestID = 1;
-		
+
 		for(Track t : tracks)
 		{
 			if(t.getID() > highestID)
 				highestID = t.getID();
 		}
-		
+
 		currentID = highestID;
 	}
-	*/
-	
+	 */
+
 	public void add(Track newTrack) {
 		tracks.add(newTrack);
+		this.format = getHighestQualityFormat();
 		updateActionListeners();
 	}
-	
+
 	public Track get(int index) {
 		return tracks.get(index);
 	}
 	
-	public Track remove(int index) {
-		ArrayList<Track> tracksAffected = new ArrayList<Track>();
-		for (Track t : tracks) {
-			if (this.get(index).getID() == t.getRelativeID()) {
-				tracksAffected.add(t);
-			}
+	public Track getByID(int ID)
+	{
+		for(Track t : tracks)
+		{
+			if(t.getID() == ID)
+				return t;
 		}
-		
+		return null;
+	}
+
+	public Track remove(int index) {
 		Track track = tracks.remove(index);
 		updateActionListeners();
 		return track;
 	}
-	
+
 	public int numTracks() {
 		return tracks.size();
 	}
-	
+
 	public ArrayList<Track> failedTracks() {
 		ArrayList<Track> failedTracks = new ArrayList<Track>();
 		for (Track track : tracks) {
@@ -130,11 +230,11 @@ public class TrackList {
 		}
 		return failedTracks;
 	}
-	
+
 	public ArrayList<Track> getTracks() {
 		return tracks;
 	}
-	
+
 	public double totalLength(){
 		double end = 0;
 		for(Track t : tracks)
@@ -144,26 +244,67 @@ public class TrackList {
 		}
 		return end;
 	}
+
+	public long totalLengthInSamples()
+	{
+		long end = 0;
+		for(Track t : tracks)
+		{
+			if(t.startSample() + t.getLengthInSamples() > end)
+				end = t.startSample() + t.getLengthInSamples();
+		}
+		return end;
+	}
 	
 	public void play() 
 	{
-		if(failedTracks().size() > 0) {
-			ArrayList<String> failedFilenames = new ArrayList<String>();
-			for (Track track : this.failedTracks()) {
-				failedFilenames.add(track.getFileName());
-			}
-			new FileNotFound(failedFilenames);
+		if(failedTracks().size() > 0)
 			return;
+		double currentTime = 0;
+		terminateSound = false;
+		Thread t = new Thread(this);
+
+		t.start();
+
+		long lastTime = System.currentTimeMillis();
+		ArrayList<Integer> playedIDs = new ArrayList<Integer>();
+
+		while(currentTime < totalLength() && !terminateSound)
+		{
+			currentTime += ((double)(System.currentTimeMillis() - lastTime)) / (1000.0);
+			lastTime = System.currentTimeMillis();
+			for(Track track : tracks)
+			{
+				if(track.startTime() < currentTime && playedIDs.indexOf(track.getID()) == -1)
+				{
+					playedIDs.add(track.getID());
+					track.playNoBlock();
+				}
+			}
 		}
-		long currentTime = System.currentTimeMillis();
-		
-		
+		t.interrupt();
+		for(Track track : tracks)
+		{
+			track.stop();
+		}
+		try 
+		{
+			t.join();
+		} 
+		catch (InterruptedException e){}
 	}
-	
-	public void addActionListener(ActionListener listener) {
+
+	public void run()
+	{
+		JOptionPane.showMessageDialog(null, "Full preview...");
+		terminateSound = true;
+	}
+
+	public void addActionListener(ActionListener listener) 
+	{
 		actionlisteners.add(listener);
 	}
-	
+
 	public void updateActionListeners() {
 		for (ActionListener listener : actionlisteners) {
 			ActionEvent ev = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "updateScript");
@@ -177,7 +318,7 @@ public class TrackList {
 			JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.");
 		}
 	}
-	
+
 	public void save(String filename) throws BadPathException {
 		try {
 			DocumentBuilderFactory dBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -295,10 +436,23 @@ public class TrackList {
 		updateActionListeners();
 	}
 	
+	public void export(String fileName) throws BadPathException
+	{
+		try {
+			File wavFile = new File(fileName);
+			ClippingInputStream outStream = new ClippingInputStream(this);
+			AudioSystem.write(outStream, AudioFileFormat.Type.WAVE, wavFile);
+		} 
+		catch (IOException e)
+		{
+			throw new BadPathException();
+		}
+	}
+	
 	public String getFileName() {
 		return fileName;
 	}
-	
+
 	private AudioFormat getHighestQualityFormat()
 	{
 		int numChannels = 1;
@@ -311,21 +465,21 @@ public class TrackList {
 			{
 				numChannels = f.getChannels();
 			}
-			
+
 			if(f.getFrameRate() > highestBitRate)
 			{
 				highestBitRate = f.getFrameRate();
 			}
-				
+
 			if(f.getSampleSizeInBits() > sampleSize)
 			{
 				sampleSize = f.getSampleSizeInBits();
 			}
 		}
-		
+
 		return new AudioFormat(highestBitRate, sampleSize, numChannels, true, false);
-  	}
-	
+	}
+
 	public AudioFormat getTrackListFormat()
 	{
 		return format;
@@ -340,15 +494,12 @@ public class TrackList {
 		return highestID + 1;
 	}
 	
-	public void export(String filename) {
-		if(failedTracks().size() > 0) {
-			ArrayList<String> failedFilenames = new ArrayList<String>();
-			for (Track track : this.failedTracks()) {
-				failedFilenames.add(track.getFileName());
-			}
-			new FileNotFound(failedFilenames);
-			return;
-		}
+	public File saveDialog(String fileExtension, String extensionDescription)
+	{
+		JFileChooser open = new JFileChooser();
+		open.setFileFilter(new FileNameExtensionFilter(extensionDescription, fileExtension));
+		open.showSaveDialog(null);
+		return new File(open.getSelectedFile().getAbsolutePath() + "." + fileExtension);
 	}
 	
 	public void clear() {
