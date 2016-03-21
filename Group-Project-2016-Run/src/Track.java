@@ -200,7 +200,10 @@ public class Track implements Runnable
 	
 	public double getLength()
 	{
-		return length;
+		if (this.isGood()) {
+			return length;
+		}
+		return 0;
 	}
 	
 	public void setIntensity(double intensity)
@@ -238,6 +241,7 @@ public class Track implements Runnable
 	
 	public boolean getStartEnd()
 	{
+		if (this.getRelativeID() == 0) return Track.START;
 		return startEnd;
 	}
 	
