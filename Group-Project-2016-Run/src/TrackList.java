@@ -212,6 +212,21 @@ public class TrackList implements Runnable
 	}
 
 	public Track remove(int index) {
+		int newRelID = 0;
+		if (this.get(index).startTime() != 0) {
+			double closest = this.totalLength();
+			for (Track t : this.getTracks()) {
+				if (t == this.get(index)) continue;
+				if ((this.get(index).startTime()-(t.startTime()+t.getLength()) >= 0) && (this.get(index).startTime()-(t.startTime()+t.getLength()) < closest)) {
+					newRelID = t.getID();
+				}
+			}
+		}
+		for (Track t : this.getTracks()) {
+			if (t.getRelativeID() == this.get(index).getID()) {
+				t.setRelativeTo(newRelID);
+			}
+		}
 		Track track = tracks.remove(index);
 		updateActionListeners();
 		return track;

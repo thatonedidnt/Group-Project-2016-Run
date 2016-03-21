@@ -1,0 +1,4 @@
+List of known bugs:
+	Playing results in an unclosable dialog box
+	Exports are silent
+	Tracks return incorrect lengths

@@ -415,11 +415,6 @@ public class Track implements Runnable
 		File file = new File(this.getFileName());
 		return file.getName();
 	}
-	
-	@Override
-	public String toString() {
-		return this.getShortFileName();
-	}
 }
 
 class AudioWaiter implements Runnable
