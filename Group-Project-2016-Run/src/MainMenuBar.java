@@ -164,8 +164,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 			}
 		}
 		if(e.getSource() == itemCreateRecording){					//create recording
-			Track newtrack = new Track(Track.RECORD, tracklist);
-			tracklist.add(newtrack);
+			Track.recordTrack(tracklist);
 		}
 		if(e.getSource() == itemPreview){							//preview
 			tracklist.play();
