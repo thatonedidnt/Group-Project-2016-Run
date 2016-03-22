@@ -1,8 +1,8 @@
 List of known bugs:
 Should be fixed now, needs testing: Playing results in an unclosable dialog box
-	Exports are silent
+	Exports are silent/all wrong
 	Recorded Tracks have incorrect lengths
-	When files are changed with Choose File, the other things aren't updated, error doesn't go away
+Should be fixed now, needs testing: When files are changed with Choose File, the other things aren't updated, error doesn't go away
 Actually untrue. my mistake: Tracks return incorrect lengths
 	
 Should be fixed now, needs testing: Sometimes get this when trying to setIntensity()

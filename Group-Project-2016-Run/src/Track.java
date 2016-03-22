@@ -74,6 +74,8 @@ public class Track implements Runnable
 		catch (Exception e)
 		{
 			isGood = false;
+		}
+		if (tracklist != null) {
 			tracklist.updateActionListeners();
 		}
 	}
@@ -103,10 +105,9 @@ public class Track implements Runnable
 		catch (Exception e)
 		{
 			isGood = false;
-
-			if (tracklist != null) {
-				tracklist.updateActionListeners();
-			}
+		}
+		if (tracklist != null) {
+			tracklist.updateActionListeners();
 		}
 	}
 	
@@ -218,9 +219,11 @@ public class Track implements Runnable
 		this.fileName = fileName;
 		try
 		{
+			soundClip = AudioSystem.getClip();
 			loadStream();
 			loadClip();
 			isGood = true;
+			tracklist.updateActionListeners();
 		}
 		catch(Exception e) 
 		{
