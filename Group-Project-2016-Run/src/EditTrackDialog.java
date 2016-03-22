@@ -167,6 +167,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 				currentTrack.getID(),
 				list
 				);
+		this.setLocationRelativeTo(null);
 	}
 	
 	private int mapIndexToComboList(int index) {
