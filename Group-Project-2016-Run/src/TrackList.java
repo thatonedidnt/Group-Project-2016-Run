@@ -24,7 +24,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 
 class ClippingInputStream extends AudioInputStream
-{
+{	
 	private long sampleLength;
 	private List<Long> frameStartList;
 	private List<Track> trackList;
@@ -108,7 +108,13 @@ class ClippingInputStream extends AudioInputStream
 
 public class TrackList implements Runnable
 {
-
+	private static final Track START = new Track("",
+			100,
+			-1,
+			Track.START,
+			0,
+			null);
+	
 	private ArrayList<Track> tracks;
 	private ArrayList<ActionListener> actionlisteners;
 	private String fileName;
@@ -203,12 +209,7 @@ public class TrackList implements Runnable
 	public Track getByID(int ID)
 	{
 		if (ID == 0) {
-			return new Track("",
-					100,
-					this.nextID(),
-					Track.START,
-					0,
-					this);
+			return TrackList.START;
 		}
 		else {
 			for(Track t : tracks)

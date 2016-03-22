@@ -93,7 +93,9 @@ public class Track implements Runnable
 		{
 			isGood = false;
 
-			tracklist.updateActionListeners();
+			if (tracklist != null) {
+				tracklist.updateActionListeners();
+			}
 		}
 	}
 	
@@ -422,11 +424,15 @@ public class Track implements Runnable
 		return file.getName();
 	}
 	
-	public boolean isCyclic(int id) { //checks if switching to the provided ID results in a loop of relativeTo
+	public boolean willBeCyclic(int relID) { //checks if switching to the provided ID results in a loop of relativeTo
 		DirectedGraph<Track, DefaultEdge> relativeTos = new DefaultDirectedGraph<Track, DefaultEdge>(DefaultEdge.class);
+		relativeTos.addVertex(tracklist.getByID(0));
+		for (Track t : tracklist.getTracks()) {
+			relativeTos.addVertex(t);
+		}
 		for (Track t : tracklist.getTracks()) {
 			if (t == this) {
-				relativeTos.addEdge(this, tracklist.getByID(id));
+				relativeTos.addEdge(this, tracklist.getByID(relID));
 			}
 			else {
 				relativeTos.addEdge(t, tracklist.getByID(t.getRelativeID()));
