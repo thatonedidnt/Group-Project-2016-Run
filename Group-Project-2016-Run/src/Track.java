@@ -390,7 +390,7 @@ public class Track implements Runnable
 		soundClip.setFramePosition(0);
 	}
 	
-	private void loadStream() throws IOException, UnsupportedAudioFileException, Exception
+	public void loadStream() throws IOException, UnsupportedAudioFileException, Exception
 	{
 		if(dataStream != null)
 			dataStream.close();

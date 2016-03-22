@@ -15,6 +15,7 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -36,7 +37,6 @@ class ClippingInputStream extends AudioInputStream
 	private List<Long> frameStartList;
 	private List<Track> trackList;
 	private long curSample;
-	private AudioFormat fmt;
 	
 	public ClippingInputStream(TrackList t) 
 	{
@@ -44,7 +44,6 @@ class ClippingInputStream extends AudioInputStream
 		sampleLength = t.totalLengthInSamples();
 		frameStartList = new ArrayList<Long>();
 		trackList = new ArrayList<Track>();
-		fmt = t.getTrackListFormat();
 		
 		for(int a=0;a<t.numTracks();a++)
 		{
@@ -69,38 +68,42 @@ class ClippingInputStream extends AudioInputStream
 		for(int a=0;a<trackList.size();a++)
 		{
 			Track t = trackList.get(a);
-			if(t.startSample() < (curSample + len) && curSample < t.startSample() + t.getLengthInSamples())
+			int frameSize = t.getFormat().getFrameSize();
+			if(t.startSample() * frameSize < (curSample + len) && curSample < (t.startSample() + t.getLengthInSamples()) * frameSize)
 			{
 				totalReads++;
 				long samplesToRead;
 				int offset = 0;
-				if(curSample < t.startSample())
+				if(curSample < t.startSample() * frameSize)
 				{
-					samplesToRead = (curSample + len) - t.startSample();
+					samplesToRead = (curSample + len) - t.startSample() * frameSize;
 					offset = (int)(t.startSample() - curSample);
 				}
-				else if((curSample + len) > (t.startSample() + t.getLengthInSamples()))
+				else if((curSample + len) > (t.startSample() + t.getLengthInSamples()) * frameSize)
 				{
-					samplesToRead = (t.startSample() + t.getLengthInSamples()) - (curSample);
+					samplesToRead = (t.startSample() + t.getLengthInSamples()) * frameSize - (curSample);
 				}
 				else
 				{
 					samplesToRead = len;
 				}
 				t.getDataStream().read(singleRead, offset, (int)samplesToRead);
-				System.out.println(singleRead[0]);
-				for(int b=offset;b<len;b++)
+				for(int b=0;b<samplesToRead;b++)
 				{
-					byteSums[b] += singleRead[b - offset];
+					byteSums[b + offset] += singleRead[b + offset];
 				}
 				maxLen = Math.max((int)samplesToRead, maxLen);
 			}
 		}
 		for(int a=0;a<len;a++)
 		{
+			if(byteSums[a] > Byte.MAX_VALUE)
+				byteSums[a] = Byte.MAX_VALUE;
+			if(byteSums[a] < Byte.MIN_VALUE)
+				byteSums[a] = Byte.MIN_VALUE;
 			buffer[a] = (byte)(byteSums[a]);
 		}
-		curSample += (len / (fmt.getFrameSize()));
+		curSample += (len);
 		if(totalReads == 0)
 			return -1;
 		else
@@ -385,6 +388,14 @@ public class TrackList implements Runnable
 		for(Track track : tracks)
 		{
 			track.stop();
+			try 
+			{
+				track.loadStream();
+			} 
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		dialog.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "stopPlay"));
 		terminateSound = true;
@@ -541,10 +552,22 @@ public class TrackList implements Runnable
 			File wavFile = new File(fileName);
 			ClippingInputStream outStream = new ClippingInputStream(this);
 			AudioSystem.write(outStream, AudioFileFormat.Type.WAVE, wavFile);
+			for(Track track : tracks)
+			{
+				track.loadStream();
+			}
 		} 
-		catch (IOException e)
+		catch(IOException e)
 		{
 			throw new BadPathException();
+		} 
+		catch(UnsupportedAudioFileException e) 
+		{
+			e.printStackTrace();
+		}
+		catch(Exception e) 
+		{
+			e.printStackTrace();
 		}
 	}
 	
