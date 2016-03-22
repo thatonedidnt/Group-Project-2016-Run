@@ -148,7 +148,7 @@ public class Track implements Runnable
 		soundClip.stop();
 		while(soundClip.getFramePosition() != 0) soundClip.setFramePosition(0);
 		soundClip.start();
-
+		//new Thread(this);
 	}
 	
 	public void play()
@@ -178,6 +178,10 @@ public class Track implements Runnable
 				dialog.add(pane);
 				dialog.addWindowListener(new WindowAdapter() {
 					public void windowClosed(WindowEvent ev) {
+						terminateSound = true;
+					}
+					
+					public void windowClosing(WindowEvent ev) {
 						terminateSound = true;
 					}
 				});
@@ -359,15 +363,19 @@ public class Track implements Runnable
 
 	private void loadClip()
 	{
-		if(soundClip.isOpen())
-			soundClip.close();
+		//if(soundClip.isOpen())
+		//	soundClip.close();
 		try 
 		{
-			soundClip.open(dataStream);
-			FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
-			float range = volumeMod.getMinimum();
-			range *= ((100.0 - this.intensity) / 100.0);
-			volumeMod.setValue(range);
+			if (dataStream != null) {
+				if (!soundClip.isOpen()){
+						soundClip.open(dataStream);
+				}
+				FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
+				float range = volumeMod.getMinimum();
+				range *= ((100.0 - this.intensity) / 100.0);
+				volumeMod.setValue(range);
+			}
 		} 
 		catch (LineUnavailableException e)
 		{
@@ -446,6 +454,15 @@ public class Track implements Runnable
 
 				});
 				recordDialog.add(pane);
+				recordDialog.addWindowListener(new WindowAdapter() {
+					public void windowClosed(WindowEvent ev) {
+						recorder.stopRecord();
+					}
+					
+					public void windowClosing(WindowEvent ev) {
+						recorder.stopRecord();
+					}
+				});
 				recordDialog.pack();
 				recordDialog.setVisible(true);
 
@@ -548,7 +565,7 @@ class AudioRecorder implements Runnable
 
 	public void stopRecord()
 	{
-		if(line != null)
+		if(line != null && line.isRunning())
 		{
 			line.stop();
 		}

@@ -1,6 +1,10 @@
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +15,11 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.*;
 import javax.xml.transform.Transformer;
@@ -108,6 +115,25 @@ class ClippingInputStream extends AudioInputStream
 
 public class TrackList implements Runnable
 {
+	private class StopDialog extends JDialog implements ActionListener {
+		private static final long serialVersionUID = 6107977679622241260L;
+		
+		private TrackList list;
+		
+		StopDialog(JFrame frame, String text, boolean iDontKnowWhatThisIs, TrackList list) {
+			super(frame, text, iDontKnowWhatThisIs);
+			this.list = list;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent ev) {
+			if (ev.getActionCommand().equals("stopPlay")) {
+				list.terminateSound = true;
+				this.dispose();
+			}
+		}
+	}
+	
 	private static final Track START = new Track("",
 			100,
 			-1,
@@ -115,6 +141,7 @@ public class TrackList implements Runnable
 			0,
 			null);
 	
+	private StopDialog dialog;
 	private ArrayList<Track> tracks;
 	private ArrayList<ActionListener> actionlisteners;
 	private String fileName;
@@ -292,43 +319,86 @@ public class TrackList implements Runnable
 			return;
 		}
 		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				JOptionPane pane = new JOptionPane("Playing Script...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION);
+				dialog = new StopDialog((JFrame)null, "Preview", false, TrackList.this);
+				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				pane.addPropertyChangeListener(new PropertyChangeListener()
+				{
+
+					@Override
+					public void propertyChange(PropertyChangeEvent arg0)
+					{
+						if(arg0.getPropertyName().equals("value"))
+						{
+							terminateSound = true;
+							dialog.dispose();	
+						}
+					}
+				});
+				dialog.add(pane);
+				dialog.addWindowListener(new WindowAdapter() {
+					public void windowClosed(WindowEvent ev) {
+						terminateSound = true;
+					}
+					
+					public void windowClosing(WindowEvent ev) {
+						terminateSound = true;
+					}
+				});
+				dialog.pack();
+				dialog.setVisible(true);
+
+			}
+		});
+		Thread t = new Thread(this);
+		t.start();
+	}
+	
+	public void run() {
 		double currentTime = 0;
 		terminateSound = false;
-		Thread t = new Thread(this);
 
-		t.start();
-
-		long lastTime = System.currentTimeMillis();
-		ArrayList<Integer> playedIDs = new ArrayList<Integer>();
-
+		long beginTime = System.currentTimeMillis();
+		//ArrayList<Integer> playedIDs = new ArrayList<Integer>();
+		boolean[] playedAlready = new boolean[this.numTracks()];
+		
 		while(currentTime < totalLength() && !terminateSound)
 		{
-			currentTime += ((double)(System.currentTimeMillis() - lastTime)) / (1000.0);
-			lastTime = System.currentTimeMillis();
+			//currentTime += ((double)(System.currentTimeMillis() - lastTime)) / (1000.0);
+			//lastTime = System.currentTimeMillis();
+			currentTime = (System.currentTimeMillis() - beginTime)/1000.0;
+			
+			for (int i = 0; i < this.numTracks(); ++i) {
+				if (!playedAlready[i] && (this.get(i).startTime() < currentTime)) {
+					playedAlready[i] = true;
+					Thread t = new Thread(this.get(i));
+					t.start();
+					System.out.println("rekt2");
+				}
+			}
+			/*
 			for(Track track : tracks)
 			{
 				if(track.startTime() < currentTime && playedIDs.indexOf(track.getID()) == -1)
 				{
+					System.out.println("rekterinos");
 					playedIDs.add(track.getID());
 					track.playNoBlock();
 				}
 			}
+			*/
 		}
-		t.interrupt();
+		System.out.println("stop!");
 		for(Track track : tracks)
 		{
 			track.stop();
 		}
-		try 
-		{
-			t.join();
-		} 
-		catch (InterruptedException e){}
-	}
-
-	public void run()
-	{
-		JOptionPane.showMessageDialog(null, "Full preview...");
+		dialog.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "stopPlay"));
 		terminateSound = true;
 	}
 
