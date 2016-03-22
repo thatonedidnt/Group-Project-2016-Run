@@ -10,7 +10,7 @@ public class PicturePane extends JPanel implements ActionListener, MouseListener
 	private static final long serialVersionUID = -562341342997159884L;
 	
 	private TrackList list;
-	private ImageIcon trackImage = new ImageIcon(this.getClass().getResource("trackImage32.png"));
+	private ImageIcon trackImage = new ImageIcon(this.getClass().getResource("TrackImage.png"));
 	//private ImageIcon leftTrack = new ImageIcon(this.getClass().getResource("GraphicsElementLeft.png"));
 	//private ImageIcon rightTrack = new ImageIcon(this.getClass().getResource("GraphicsElementRight.png"));
 	//private ImageIcon centerTrack = new ImageIcon(this.getClass().getResource("GraphicsElementCenter.png"));
