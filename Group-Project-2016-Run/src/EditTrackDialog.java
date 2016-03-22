@@ -77,7 +77,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		ArrayList<TrackForwarder> comboItems = new ArrayList<TrackForwarder>();
 		comboItems.add(new TrackForwarder(null, "Start"));
 		for (Track t : list.getTracks()) {
-			if (t == currentTrack) continue;
+			if ((t == currentTrack) || currentTrack.willBeCyclic(t.getID())) continue;
 			comboItems.add(new TrackForwarder(t, t.getShortFileName()));
 		}
 		chooseTrack = new JComboBox<TrackForwarder>(comboItems.toArray(new TrackForwarder[0])); 

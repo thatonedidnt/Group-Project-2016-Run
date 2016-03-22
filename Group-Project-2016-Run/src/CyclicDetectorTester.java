@@ -27,6 +27,7 @@ public class CyclicDetectorTester {
 		else {
 			System.out.println("won't be rekt");
 		}
+		new MainScreen(tracklist);
 	}
 
 }

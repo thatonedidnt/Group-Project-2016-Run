@@ -4,7 +4,7 @@ Done, needs testing: Add the time scale for PicturePane, and align it with Track
 Done, needs testing: Make vertical scrollbar and link it
 Done, needs testing: Make horizontal scrollbar and link it
 Done, needs testing: Fix startTime() problem
-	Find out how to prevent loops in relative IDs
+Done, needs testing: Find out how to prevent loops in relative IDs
 Done, needs testing: Handle removal correctly
 Done, needs testing: Update all JFileChoosers to only select certain file types
 Done, needs testing: Make the PicturePane repaint itself when things change
