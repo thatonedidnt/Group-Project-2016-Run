@@ -261,8 +261,8 @@ public class Track implements Runnable
 				dataStream.setAmplitudeLog(range);
 			}
 		}
-		catch (LineUnavailableException e) { }
-		catch (IOException e) { }
+		catch (LineUnavailableException e) {e.printStackTrace(); }
+		catch (IOException e) { e.printStackTrace();}
 	}
 	
 	public double getIntensity()
@@ -383,6 +383,7 @@ public class Track implements Runnable
 		if(dataStream != null)
 			dataStream.close();
 		dataStream = new AmplitudeAudioInputStream(getConvertedInputStream(AudioSystem.getAudioInputStream(new File(fileName))));
+		setIntensity(this.getIntensity());
 	}
 	
 	private AudioInputStream getConvertedInputStream(AudioInputStream s) throws Exception
@@ -407,13 +408,12 @@ public class Track implements Runnable
 	
 	private long getSampleLength(AudioInputStream s)
 	{
-		double frameLength = (double)s.getFrameLength() / (double)s.getFormat().getFrameSize();
-		if(s.getFormat().getFrameSize() == 4)
-			frameLength /= 2.0;
+		double frameLength = (double)s.getFrameLength();
+		if(s.getFormat().getSampleSizeInBits() == 32)//why????
+			frameLength /= 4;
 		double frameRate = (double) s.getFormat().getFrameRate();
 		double targetRate = (double) tracklist.getTrackListFormat().getFrameRate();
 		double ret = (targetRate / frameRate) * frameLength;
-		ret *= ((double)tracklist.getTrackListFormat().getChannels() / (double)s.getFormat().getChannels());
 		return (long)ret;
 	}
 	
@@ -551,6 +551,7 @@ class AudioRecorder implements Runnable
 		File delTemp = new File("temp.wav");
 		delTemp.delete();
 		tracklist.add(new Track(save.getAbsolutePath(), tracklist));
+		tracklist.updateActionListeners();
 	}
 
 	public void stopRecord()
