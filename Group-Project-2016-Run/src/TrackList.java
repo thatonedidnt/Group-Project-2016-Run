@@ -145,6 +145,7 @@ public class TrackList implements Runnable
 	private ArrayList<Track> tracks;
 	private ArrayList<ActionListener> actionlisteners;
 	private String fileName;
+	private JFrame parentFrame = null;
 
 	private AudioFormat format;
 
@@ -325,8 +326,9 @@ public class TrackList implements Runnable
 			public void run()
 			{
 				JOptionPane pane = new JOptionPane("Playing Script...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION);
-				dialog = new StopDialog((JFrame)null, "Preview", false, TrackList.this);
+				dialog = new StopDialog((JFrame)parentFrame, "Preview", false, TrackList.this);
 				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setAlwaysOnTop(true);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
 
@@ -629,5 +631,9 @@ public class TrackList implements Runnable
 			}
 		}
 		return -1;
+	}
+	
+	public void setParentFrame(JFrame frame) {
+		this.parentFrame = frame;
 	}
 }

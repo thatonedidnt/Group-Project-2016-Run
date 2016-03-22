@@ -36,6 +36,7 @@ public class MainScreen extends JFrame implements ActionListener {
 		TrackTableVertBar.setModel(PicturePaneVertBar.getModel());
 		//timescalescroller.getVerticalScrollBar().setModel(((MainScreen)this.getParent()).getTrackTableScrollPane().getVerticalScrollBar().getModel());
 		
+		list.setParentFrame(this);
 		
 		mainFrame.pack();
 		mainFrame.setVisible(true);

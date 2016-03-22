@@ -161,20 +161,7 @@ public class Track implements Runnable
 				JOptionPane pane = new JOptionPane("Preview...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION);
 				dialog = new JDialog((JFrame)null, "Preview", false);
 				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-				pane.addPropertyChangeListener(new PropertyChangeListener()
-				{
-
-					@Override
-					public void propertyChange(PropertyChangeEvent arg0)
-					{
-						if(arg0.getPropertyName().equals("value"))
-						{
-							terminateSound = true;
-							dialog.dispose();	
-						}
-					}
-
-				});
+				dialog.setAlwaysOnTop(true);
 				dialog.add(pane);
 				dialog.addWindowListener(new WindowAdapter() {
 					public void windowClosed(WindowEvent ev) {
