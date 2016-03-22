@@ -338,7 +338,6 @@ public class TrackList implements Runnable
 						if(arg0.getPropertyName().equals("value"))
 						{
 							terminateSound = true;
-							dialog.dispose();	
 						}
 					}
 				});
@@ -380,22 +379,9 @@ public class TrackList implements Runnable
 					playedAlready[i] = true;
 					Thread t = new Thread(this.get(i));
 					t.start();
-					System.out.println("rekt2");
 				}
 			}
-			/*
-			for(Track track : tracks)
-			{
-				if(track.startTime() < currentTime && playedIDs.indexOf(track.getID()) == -1)
-				{
-					System.out.println("rekterinos");
-					playedIDs.add(track.getID());
-					track.playNoBlock();
-				}
-			}
-			*/
 		}
-		System.out.println("stop!");
 		for(Track track : tracks)
 		{
 			track.stop();

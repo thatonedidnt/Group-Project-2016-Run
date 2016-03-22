@@ -163,6 +163,18 @@ public class Track implements Runnable
 				dialog = new JDialog((JFrame)null, "Preview", false);
 				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 				dialog.setAlwaysOnTop(true);
+				pane.addPropertyChangeListener(new PropertyChangeListener()
+				{
+
+					@Override
+					public void propertyChange(PropertyChangeEvent arg0)
+					{
+						if(arg0.getPropertyName().equals("value"))
+						{
+							terminateSound = true;
+						}
+					}
+				});
 				dialog.add(pane);
 				dialog.addWindowListener(new WindowAdapter() {
 					public void windowClosed(WindowEvent ev) {
