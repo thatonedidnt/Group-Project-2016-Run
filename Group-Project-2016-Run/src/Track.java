@@ -1,4 +1,6 @@
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -174,6 +176,11 @@ public class Track implements Runnable
 
 				});
 				dialog.add(pane);
+				dialog.addWindowListener(new WindowAdapter() {
+					public void windowClosed(WindowEvent ev) {
+						terminateSound = true;
+					}
+				});
 				dialog.pack();
 				dialog.setVisible(true);
 
