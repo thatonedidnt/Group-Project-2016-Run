@@ -341,7 +341,6 @@ public class TrackList implements Runnable
 						if(arg0.getPropertyName().equals("value"))
 						{
 							terminateSound = true;
-							dialog.dispose();	
 						}
 					}
 				});
