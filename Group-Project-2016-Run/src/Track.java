@@ -1,18 +1,35 @@
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 
+import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.TargetDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.tritonus.dsp.ais.AmplitudeAudioInputStream;
 
 
 public class Track implements Runnable
 {
+	public static final AudioFormat RECORD_FMT = new AudioFormat(44100, 16, 2, true, false);
+	
 	private String fileName;
 	private double length;
 	private double intensity;
@@ -20,20 +37,24 @@ public class Track implements Runnable
 	private int relativeTo;
 	private boolean startEnd;
 	private int ID;
-	private AudioInputStream dataStream;
+	private AmplitudeAudioInputStream dataStream;
 	private TrackList tracklist;
 	private Clip soundClip;
 	
 	private boolean isGood;
 	private volatile boolean terminateSound;
-	
+	private JDialog dialog;
+	private JDialog recordDialog;
+
 	public static final int RECORD = 1;
 	public static final boolean START = true;
 	public static final boolean END = false;
 	public static final int TRACK_BEGINNING = 0;
+	private final AudioRecorder recorder;
 	
 	public Track(String fileName, TrackList tracklist)
 	{
+		recorder = null;
 		this.fileName = fileName;
 		intensity = 100;
 		ID = tracklist.nextID();
@@ -43,12 +64,9 @@ public class Track implements Runnable
 		isGood = true;
 		try 
 		{
+			loadStream();
 			soundClip = AudioSystem.getClip();
-		} 
-		catch(LineUnavailableException e) 
-		{}
-		try 
-		{
+			loadClip();
 			loadStream();
 		} 
 		catch (Exception e)
@@ -60,6 +78,7 @@ public class Track implements Runnable
 	
 	public Track(String fileName, double intensity, int relativeTo, boolean startEnd, int ID, TrackList tracklist)
 	{
+		recorder = null;
 		this.fileName = fileName;
 		this.intensity = intensity;
 		this.relativeTo = relativeTo;
@@ -83,57 +102,116 @@ public class Track implements Runnable
 		{
 			isGood = false;
 
-			tracklist.updateActionListeners();
+			if (tracklist != null) {
+				tracklist.updateActionListeners();
+			}
 		}
 	}
 	
-	Track(int mode, TrackList tracklist)
+	public void makeMeBad()
 	{
+		this.isGood = false;
+	}
+	
+	public static void recordTrack(TrackList tracklist)
+	{
+		try 
+		{
+			Track temp = new Track(tracklist);
+			temp.record();
+		} 
+		catch(LineUnavailableException e) 
+		{
+		}
+		catch(Exception e) 
+		{
+		}
+
+	}
+
+
+	public Track(TrackList tracklist) throws LineUnavailableException
+	{
+		recorder = new AudioRecorder(this, tracklist);
 		this.tracklist = tracklist;
-		fileName = "";
-		length = -1;
-		lengthInSamples = -1;
-		relativeTo = TRACK_BEGINNING;
-		ID = tracklist.nextID();
-		startEnd = START;
-		intensity = 100;
-		isGood = true;
+
 	}
 	
 	public void playNoBlock()
 	{
-		try 
+		if(!soundClip.isOpen())
 		{
-			loadStream();
+			loadClip();
 		}
-		catch (Exception e)
-		{
-			isGood = false;
-			tracklist.updateActionListeners();
-		}
+		soundClip.stop();
+		while(soundClip.getFramePosition() != 0) soundClip.setFramePosition(0);
 		soundClip.start();
+
 	}
 	
 	public void play()
 	{
-		playNoBlock();
-		terminateSound = false;
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				JOptionPane pane = new JOptionPane("Preview...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION);
+				dialog = new JDialog((JFrame)null, "Preview", false);
+				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				pane.addPropertyChangeListener(new PropertyChangeListener()
+				{
+
+					@Override
+					public void propertyChange(PropertyChangeEvent arg0)
+					{
+						if(arg0.getPropertyName().equals("value"))
+						{
+							terminateSound = true;
+							dialog.dispose();	
+						}
+					}
+
+				});
+				dialog.add(pane);
+				dialog.pack();
+				dialog.setVisible(true);
+
+			}
+		});
 		Thread t = new Thread(this);
 		t.start();
-		while(soundClip.isRunning() && !terminateSound);
-		t.interrupt();
 	}
 	
 	//	FOR PLAY METHOD
 	public void run()
 	{
-		JOptionPane.showMessageDialog(null, "Preview...");
-		terminateSound = true;
+
+		playNoBlock();
+		terminateSound = false;
+
+
+		while(soundClip.getFramePosition() == 0);
+		while(soundClip.isRunning() && !terminateSound);
+
+		stop();
+		if(dialog != null && dialog.isActive())
+			dialog.dispose();
+	}
+	
+	public void stop()
+	{
+		if(soundClip != null)
+		{
+			if(soundClip.isRunning())
+				soundClip.stop();
+		}
 	}
 	
 	public Clip getSound()
 	{
-		reloadClip();
+		if(!soundClip.isOpen())
+			loadClip();
 		return soundClip;
 	}
 
@@ -143,6 +221,7 @@ public class Track implements Runnable
 		try
 		{
 			loadStream();
+			loadClip();
 		} 
 		catch(Exception e) 
 		{
@@ -158,15 +237,28 @@ public class Track implements Runnable
 	
 	public double getLength()
 	{
-		//TODO: REMOVE DEBUGGING CODE
-		return 30;
-		//return length;
+		if (this.isGood()) {
+			return length;
+		}
+		return 0;
 	}
 	
 	public void setIntensity(double intensity)
 	{
 		this.intensity = intensity;
-		tracklist.updateActionListeners();
+		try {
+			if (!soundClip.isOpen()) {
+				soundClip.open(dataStream);
+			}
+			FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
+			float range = volumeMod.getMinimum();
+			range *= ((100.0 - this.intensity) / 100.0);
+			volumeMod.setValue(range);
+			tracklist.updateActionListeners();
+			dataStream.setAmplitudeLog(range);
+		}
+		catch (LineUnavailableException e) { }
+		catch (IOException e) { }
 	}
 	
 	public double getIntensity()
@@ -206,7 +298,7 @@ public class Track implements Runnable
 	{
 		if(relativeTo == 0)
 			return 0;
-		Track relativeTrack = tracklist.get(tracklist.getIndexByID(relativeTo));
+		Track relativeTrack = tracklist.getByID(relativeTo);
 		double relativeTime = relativeTrack.startTime();
 		if(startEnd == START) //relative to beginning
 			return relativeTime;
@@ -221,12 +313,41 @@ public class Track implements Runnable
 	
 	public AudioFormat getFormat()
 	{
-		return dataStream.getFormat();
+		if (dataStream != null) {
+			return dataStream.getFormat();
+		}
+		else {
+			return new AudioFormat(8000,8,1,false,false);
+		}
 	}
 	
-	//~~
+	public long getLengthInSamples()
+	{
+		return lengthInSamples;
+	}
+	
+	public long startSample()
+	{
+		if(relativeTo == 0)
+			return 0;
+		Track relativeTrack = tracklist.getByID(relativeTo);
+		long relativeSample = relativeTrack.startSample();
+		if(startEnd == START) //relative to beginning
+			return relativeSample;
+		else
+			return relativeSample + relativeTrack.getLengthInSamples();
+	}
 
-	private void reloadClip()
+	public AudioInputStream getDataStream()
+	{
+		return dataStream;
+	}
+	
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+	private void loadClip()
 	{
 		if(soundClip.isOpen())
 			soundClip.close();
@@ -235,7 +356,6 @@ public class Track implements Runnable
 			soundClip.open(dataStream);
 			FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
 			float range = volumeMod.getMinimum();
-			
 			range *= ((100.0 - this.intensity) / 100.0);
 			volumeMod.setValue(range);
 		} 
@@ -254,7 +374,7 @@ public class Track implements Runnable
 	{
 		if(dataStream != null)
 			dataStream.close();
-		dataStream = getConvertedInputStream(AudioSystem.getAudioInputStream(new File(fileName)));
+		dataStream = new AmplitudeAudioInputStream(getConvertedInputStream(AudioSystem.getAudioInputStream(new File(fileName))));
 	}
 	
 	private AudioInputStream getConvertedInputStream(AudioInputStream s) throws Exception
@@ -279,16 +399,148 @@ public class Track implements Runnable
 	
 	private long getSampleLength(AudioInputStream s)
 	{
-		double frameLength = s.getFrameLength();
+		double frameLength = (double)s.getFrameLength() / (double)s.getFormat().getFrameSize();
+		if(s.getFormat().getFrameSize() == 4)
+			frameLength /= 2.0;
 		double frameRate = (double) s.getFormat().getFrameRate();
 		double targetRate = (double) tracklist.getTrackListFormat().getFrameRate();
 		double ret = (targetRate / frameRate) * frameLength;
-		frameLength *= ((double)tracklist.getTrackListFormat().getChannels() / (double)s.getFormat().getChannels());
+		ret *= ((double)tracklist.getTrackListFormat().getChannels() / (double)s.getFormat().getChannels());
 		return (long)ret;
 	}
+	
+	public void record() throws LineUnavailableException, Exception
+	{
+		Thread t = new Thread(recorder);
+		t.start();
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				JOptionPane pane = new JOptionPane("Recording...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION);
+				recordDialog = new JDialog((JFrame)null, "Record", false);
+				recordDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				pane.addPropertyChangeListener(new PropertyChangeListener()
+				{
 
+					@Override
+					public void propertyChange(PropertyChangeEvent arg0)
+					{
+						if(arg0.getPropertyName().equals("value"))
+						{
+							recorder.stopRecord();
+							recordDialog.dispose();
+						}
+					}
+
+				});
+				recordDialog.add(pane);
+				recordDialog.pack();
+				recordDialog.setVisible(true);
+
+			}
+		});
+	}
+	
 	public String getShortFileName() {
 		File file = new File(this.getFileName());
 		return file.getName();
+	}
+	
+	public boolean willBeCyclic(int relID) { //checks if switching to the provided ID results in a loop of relativeTo
+		DirectedGraph<Track, DefaultEdge> relativeTos = new DefaultDirectedGraph<Track, DefaultEdge>(DefaultEdge.class);
+		relativeTos.addVertex(tracklist.getByID(0));
+		for (Track t : tracklist.getTracks()) {
+			relativeTos.addVertex(t);
+		}
+		for (Track t : tracklist.getTracks()) {
+			if (t == this) {
+				relativeTos.addEdge(this, tracklist.getByID(relID));
+			}
+			else {
+				relativeTos.addEdge(t, tracklist.getByID(t.getRelativeID()));
+			}
+		}
+		
+		CycleDetector<Track, DefaultEdge> cycledetector = new CycleDetector<Track, DefaultEdge>(relativeTos);
+		
+		return cycledetector.detectCycles();
+	}
+}
+
+class AudioRecorder implements Runnable
+{
+	private Track track;
+	private TrackList tracklist;
+	private TargetDataLine line;
+
+	public AudioRecorder(Track recorder, TrackList tl) throws LineUnavailableException
+	{
+		line = (TargetDataLine)AudioSystem.getLine(new DataLine.Info(TargetDataLine.class, Track.RECORD_FMT));
+		line.open(Track.RECORD_FMT);
+		track = recorder;
+		this.tracklist = tl;
+	}
+
+	@Override
+	public void run()
+	{
+		File temp = new File("temp.wav");
+		DataLine.Info info = new DataLine.Info(TargetDataLine.class, Track.RECORD_FMT);
+		if(!AudioSystem.isLineSupported(info))
+		{
+			track.makeMeBad();
+			return;
+		}
+		try
+		{
+			line.open(Track.RECORD_FMT);
+		}
+		catch(Exception e)
+		{
+			track.makeMeBad();
+			return;
+		}
+
+		AudioInputStream recordStream = new AudioInputStream(line);
+		line.start();
+		try 
+		{
+			AudioSystem.write(recordStream, AudioFileFormat.Type.WAVE, temp);
+		}
+		catch(IOException e)
+		{
+			track.makeMeBad();
+			return;
+		}
+		File save = tracklist.saveDialog("wav", "WAVE File");
+		if(save == null)
+		{
+			temp.delete();
+			track.makeMeBad();
+			return;
+		}
+		temp.renameTo(save);
+		line.close();
+
+		try 
+		{
+			recordStream.close();
+		} 
+		catch(IOException e){}
+
+		track.setFileName(save.getAbsolutePath());
+		File delTemp = new File("temp.wav");
+		delTemp.delete();
+		tracklist.add(new Track(save.getAbsolutePath(), tracklist));
+	}
+
+	public void stopRecord()
+	{
+		if(line != null)
+		{
+			line.stop();
+		}
 	}
 }

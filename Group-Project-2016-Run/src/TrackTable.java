@@ -133,6 +133,7 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 		switch (ev.getActionCommand()) {
 		case "updateScript":
 			model.fireTableDataChanged();
+			this.updateListeners();
 			break;
 		case "Edit...":
 			if (table.getSelectedRow() != -1) {
