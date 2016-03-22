@@ -11,11 +11,7 @@ public class PicturePane extends JPanel implements ActionListener, MouseListener
 	
 	private TrackList list;
 	private ImageIcon trackImage = new ImageIcon(this.getClass().getResource("TrackImage.png"));
-	//private ImageIcon leftTrack = new ImageIcon(this.getClass().getResource("GraphicsElementLeft.png"));
-	//private ImageIcon rightTrack = new ImageIcon(this.getClass().getResource("GraphicsElementRight.png"));
-	//private ImageIcon centerTrack = new ImageIcon(this.getClass().getResource("GraphicsElementCenter.png"));
 	private static final int SCALE_SPACING = 15;
-	//private static final int SIDE_WIDTH = 10;
 	private static final int IMAGE_HEIGHT = 32;
 	public static final int PIXELS_PER_SECOND = 8;
 	private static final int SCALE_INTERVAL = 5;
