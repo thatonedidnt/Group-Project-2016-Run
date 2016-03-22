@@ -114,7 +114,6 @@ public class TrackList implements Runnable
 	private String fileName;
 
 	private AudioFormat format;
-	private static int currentID = 1;
 
 	private volatile boolean terminateSound;
 
@@ -203,12 +202,22 @@ public class TrackList implements Runnable
 	
 	public Track getByID(int ID)
 	{
-		for(Track t : tracks)
-		{
-			if(t.getID() == ID)
-				return t;
+		if (ID == 0) {
+			return new Track("",
+					100,
+					this.nextID(),
+					Track.START,
+					0,
+					this);
 		}
-		return null;
+		else {
+			for(Track t : tracks)
+			{
+				if(t.getID() == ID)
+					return t;
+			}
+			return null;
+		}
 	}
 
 	public Track remove(int index) {

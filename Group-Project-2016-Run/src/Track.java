@@ -13,6 +13,11 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JOptionPane;
+
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 import org.tritonus.dsp.ais.AmplitudeAudioInputStream;
 
 
@@ -411,9 +416,26 @@ public class Track implements Runnable
 		File delTemp = new File("temp.wav");
 		delTemp.delete();
 	}
+	
 	public String getShortFileName() {
 		File file = new File(this.getFileName());
 		return file.getName();
+	}
+	
+	public boolean isCyclic(int id) { //checks if switching to the provided ID results in a loop of relativeTo
+		DirectedGraph<Track, DefaultEdge> relativeTos = new DefaultDirectedGraph<Track, DefaultEdge>(DefaultEdge.class);
+		for (Track t : tracklist.getTracks()) {
+			if (t == this) {
+				relativeTos.addEdge(this, tracklist.getByID(id));
+			}
+			else {
+				relativeTos.addEdge(t, tracklist.getByID(t.getRelativeID()));
+			}
+		}
+		
+		CycleDetector<Track, DefaultEdge> cycledetector = new CycleDetector<Track, DefaultEdge>(relativeTos);
+		
+		return cycledetector.detectCycles();
 	}
 }
 
