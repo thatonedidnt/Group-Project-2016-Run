@@ -10,6 +10,7 @@ public class PicturePane extends JPanel implements ActionListener, MouseListener
 	private static final long serialVersionUID = -562341342997159884L;
 	
 	private TrackList list;
+	private ImageIcon trackImage = new ImageIcon(this.getClass().getResource("trackImage32.png"));
 	//private ImageIcon leftTrack = new ImageIcon(this.getClass().getResource("GraphicsElementLeft.png"));
 	//private ImageIcon rightTrack = new ImageIcon(this.getClass().getResource("GraphicsElementRight.png"));
 	//private ImageIcon centerTrack = new ImageIcon(this.getClass().getResource("GraphicsElementCenter.png"));
@@ -46,10 +47,14 @@ public class PicturePane extends JPanel implements ActionListener, MouseListener
 		for (int i=0; i< list.numTracks(); i++) {
 			g.setColor(new Color(150,170,255));
 			//g.fillRoundRect(arg0, arg1, arg2, arg3, arg4, arg5)
+			
+			g.drawImage(trackImage.getImage(), (int)(list.get(i).startTime()*PIXELS_PER_SECOND), i*IMAGE_HEIGHT, (int)(list.get(i).getLength()*PIXELS_PER_SECOND), IMAGE_HEIGHT-1, null);
+			/*
 			g.fillRoundRect((int)(list.get(i).startTime()*PIXELS_PER_SECOND),
 					i*IMAGE_HEIGHT,
 					(int)(list.get(i).getLength()*PIXELS_PER_SECOND),
 					IMAGE_HEIGHT-1, 4, 4);
+			*/
 			/*
 			g.fillRect((int)(list.get(i).startTime()*PIXELS_PER_SECOND),
 					i*IMAGE_HEIGHT + FIRST_ROW_OFFSET,
