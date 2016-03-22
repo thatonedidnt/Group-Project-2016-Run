@@ -1,9 +1,9 @@
 List of known bugs:
 	Playing results in an unclosable dialog box
 	Exports are silent
-	Tracks return incorrect lengths
+Actually untrue. my mistake: Tracks return incorrect lengths
 	
-	Sometimes get this when trying to setIntensity()
+Should be fixed now, needs testing: Sometimes get this when trying to setIntensity()
 Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: Unsupported control type: Master Gain
 	at com.sun.media.sound.AbstractLine.getControl(Unknown Source)
 	at Track.setIntensity(Track.java:220)

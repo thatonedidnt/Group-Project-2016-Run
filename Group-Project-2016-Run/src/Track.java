@@ -216,12 +216,19 @@ public class Track implements Runnable
 	public void setIntensity(double intensity)
 	{
 		this.intensity = intensity;
-		FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
-		float range = volumeMod.getMinimum();
-		range *= ((100.0 - this.intensity) / 100.0);
-		volumeMod.setValue(range);
-		tracklist.updateActionListeners();
-		dataStream.setAmplitudeLog(range);
+		try {
+			if (!soundClip.isOpen()) {
+				soundClip.open(dataStream);
+			}
+			FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
+			float range = volumeMod.getMinimum();
+			range *= ((100.0 - this.intensity) / 100.0);
+			volumeMod.setValue(range);
+			tracklist.updateActionListeners();
+			dataStream.setAmplitudeLog(range);
+		}
+		catch (LineUnavailableException e) { }
+		catch (IOException e) { }
 	}
 	
 	public double getIntensity()
