@@ -314,8 +314,6 @@ public class TrackList implements Runnable
 		
 		while(currentTime < totalLength() && !terminateSound)
 		{
-			//currentTime += ((double)(System.currentTimeMillis() - lastTime)) / (1000.0);
-			//lastTime = System.currentTimeMillis();
 			currentTime = (System.currentTimeMillis() - beginTime)/1000.0;
 			double starterInterval = totalLength();
 			for (int i = 0; i < this.numTracks(); ++i) {
@@ -324,7 +322,6 @@ public class TrackList implements Runnable
 					Thread t = new Thread(this.get(i));
 					t.start();
 				}
-				System.out.print((this.get(i).startTime()-currentTime)+" ");
 				if (!playedAlready[i] && (this.get(i).startTime()-currentTime < starterInterval)) {
 					if (this.get(i).startTime()-currentTime < 0) {
 						starterInterval = 0;
@@ -334,7 +331,6 @@ public class TrackList implements Runnable
 					}
 				}
 			}
-			System.out.println(starterInterval);
 			try {
 				Thread.sleep((int)(starterInterval*1000));
 			}
