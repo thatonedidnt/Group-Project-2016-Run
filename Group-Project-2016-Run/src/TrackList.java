@@ -259,6 +259,8 @@ public class TrackList implements Runnable
 			return;
 		}
 		
+		final Thread t = new Thread(this);
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			@Override
@@ -266,7 +268,8 @@ public class TrackList implements Runnable
 			{
 				JOptionPane pane = new JOptionPane("Playing Script...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				dialog = new StopDialog((JFrame)parentFrame, "Preview", false, TrackList.this);
-				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				//dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setAlwaysOnTop(true);
 				dialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
@@ -277,6 +280,7 @@ public class TrackList implements Runnable
 						if(arg0.getPropertyName().equals("value"))
 						{
 							terminateSound = true;
+							t.interrupt();
 						}
 					}
 				});
@@ -284,10 +288,12 @@ public class TrackList implements Runnable
 				dialog.addWindowListener(new WindowAdapter() {
 					public void windowClosed(WindowEvent ev) {
 						terminateSound = true;
+						t.interrupt();
 					}
 					
 					public void windowClosing(WindowEvent ev) {
 						terminateSound = true;
+						t.interrupt();
 					}
 				});
 				dialog.pack();
@@ -295,7 +301,6 @@ public class TrackList implements Runnable
 
 			}
 		});
-		Thread t = new Thread(this);
 		t.start();
 	}
 	
@@ -312,14 +317,28 @@ public class TrackList implements Runnable
 			//currentTime += ((double)(System.currentTimeMillis() - lastTime)) / (1000.0);
 			//lastTime = System.currentTimeMillis();
 			currentTime = (System.currentTimeMillis() - beginTime)/1000.0;
-			
+			double starterInterval = totalLength();
 			for (int i = 0; i < this.numTracks(); ++i) {
 				if (!playedAlready[i] && (this.get(i).startTime() < currentTime)) {
 					playedAlready[i] = true;
 					Thread t = new Thread(this.get(i));
 					t.start();
 				}
+				System.out.print((this.get(i).startTime()-currentTime)+" ");
+				if (!playedAlready[i] && (this.get(i).startTime()-currentTime < starterInterval)) {
+					if (this.get(i).startTime()-currentTime < 0) {
+						starterInterval = 0;
+					}
+					else {
+						starterInterval = this.get(i).startTime()-currentTime;
+					}
+				}
 			}
+			System.out.println(starterInterval);
+			try {
+				Thread.sleep((int)(starterInterval*1000));
+			}
+			catch (InterruptedException ex) {}
 		}
 		for(Track track : tracks)
 		{

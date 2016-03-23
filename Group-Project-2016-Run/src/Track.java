@@ -171,6 +171,7 @@ public class Track implements Runnable
 				JOptionPane pane = new JOptionPane("Previewing Track...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				dialog = new JDialog((JFrame)null, "Preview", false);
 				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setAlwaysOnTop(true);
 				dialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
@@ -212,7 +213,10 @@ public class Track implements Runnable
 
 
 		while(soundClip.getFramePosition() == 0);
-		while(soundClip.isRunning() && !terminateSound);
+		try {
+			while(soundClip.isRunning() && !terminateSound) Thread.sleep(20);
+		}
+		catch (InterruptedException ex) {}
 
 		stop();
 		if(dialog != null && dialog.isActive())
