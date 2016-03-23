@@ -266,7 +266,6 @@ public class TrackList implements Runnable
 				dialog = new StopDialog((JFrame)parentFrame, "Preview", false, TrackList.this);
 				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 				dialog.setResizable(false);
-				dialog.setAlwaysOnTop(true);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
 
