@@ -506,6 +506,11 @@ public class Track implements Runnable
 		
 		return cycledetector.detectCycles();
 	}
+	
+	@Override
+	public String toString() {
+		return this.getShortFileName();
+	}
 }
 
 class AudioRecorder implements Runnable

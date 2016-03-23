@@ -3,6 +3,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
+import org.jgraph.JGraph;
+import org.jgrapht.ext.JGraphModelAdapter;
+import org.jgrapht.graph.DefaultEdge;
+
 public class MainScreen extends JFrame implements ActionListener {
 	private static final long serialVersionUID = -5747885815904079529L;
 	
@@ -27,8 +31,13 @@ public class MainScreen extends JFrame implements ActionListener {
 		MainMenuBar menuBar = new MainMenuBar(tracklist);
 		mainFrame.setJMenuBar(menuBar);
 		trackTablePane = new TrackTablePane(tracklist);
+		JGraphModelAdapter<Track, DefaultEdge> adapter = new JGraphModelAdapter<Track, DefaultEdge>(tracklist.getGraph());
+		JGraph jgraph = new JGraph(adapter);
+		JSplitPane lhp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, trackTablePane, jgraph);
+		
 		RightHalfPane righthalfpane = new RightHalfPane(tracklist);
-		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, trackTablePane, righthalfpane);
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, lhp, righthalfpane);
+		
 		mainFrame.add(splitPane);
 		
 		JScrollBar TrackTableVertBar = trackTablePane.getTrackTableScrollPane().getVerticalScrollBar();

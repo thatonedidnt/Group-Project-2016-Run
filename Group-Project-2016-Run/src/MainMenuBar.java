@@ -15,6 +15,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 	private String lastPathOpen;
 	private String lastPathNew;
 	private String lastPathSaveAs;
+	private String lastPathNewTrack;
 	private String lastPathExport;
 
 	MainMenuBar(TrackList trackList){
@@ -23,6 +24,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 		lastPathOpen = null;
 		lastPathNew = null;
 		lastPathSaveAs = null;
+		lastPathNewTrack = null;
 		lastPathExport = null;
 
 		menuFile=new JMenu("File");
@@ -165,13 +167,14 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 			System.exit(0);
 		}
 		if(e.getSource() == itemNewTrack){							//new track
-			JFileChooser fc = new JFileChooser();
+			JFileChooser fc = new JFileChooser(lastPathNewTrack);
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("WAV audio (*.wav)", "wav");
 			fc.addChoosableFileFilter(filter);
 			fc.setFileFilter(filter);
 			int returnVal = fc.showDialog(itemOpen, "Select audio file...");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
+				lastPathNewTrack = file.getParent();
 				Track newtrack = new Track(file.getAbsolutePath(), tracklist);
 				int latestRelID = 0;
 				double latestEnd = 0;

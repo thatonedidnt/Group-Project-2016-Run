@@ -8,6 +8,11 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.ListenableDirectedGraph;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
@@ -151,6 +156,7 @@ public class TrackList implements Runnable
 	private ArrayList<ActionListener> actionlisteners;
 	private String fileName;
 	private JFrame parentFrame = null;
+	private ListenableDirectedGraph<Track, DefaultEdge> graph;
 
 	private AudioFormat format;
 
@@ -161,6 +167,7 @@ public class TrackList implements Runnable
 		tracks = new ArrayList<Track>();
 		actionlisteners = new ArrayList<ActionListener>();
 		format = new AudioFormat(44100, 16, 2, true, false);
+		graph = new ListenableDirectedGraph<Track, DefaultEdge>(DefaultEdge.class);
 	}
 
 	public void add(Track newTrack) {
@@ -346,6 +353,16 @@ public class TrackList implements Runnable
 	}
 
 	public void updateActionListeners() {
+		//graph.removeAllVertices(graph.vertexSet());
+		GraphUtility.clearGraph(graph);
+		graph.addVertex(this.getByID(0));
+		for (Track t : this.getTracks()) {
+			graph.addVertex(t);
+		}
+		for (Track t : this.getTracks()) {
+			graph.addEdge(t, this.getByID(t.getRelativeID()));
+		}
+		
 		for (ActionListener listener : actionlisteners) {
 			ActionEvent ev = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "updateScript");
 			listener.actionPerformed(ev);
@@ -595,5 +612,9 @@ public class TrackList implements Runnable
 	
 	public void setParentFrame(JFrame frame) {
 		this.parentFrame = frame;
+	}
+	
+	public DirectedGraph<Track, DefaultEdge> getGraph() {
+		return graph;
 	}
 }
