@@ -163,7 +163,7 @@ public class TrackList implements Runnable
 
 	public void add(Track newTrack) {
 		tracks.add(newTrack);
-		this.format = getHighestQualityFormat();
+//		this.format = getHighestQualityFormat();
 		updateActionListeners();
 	}
 
@@ -323,6 +323,9 @@ public class TrackList implements Runnable
 		for(Track track : tracks)
 		{
 			track.stop();
+		}
+		for(Track track : tracks)
+		{
 			try 
 			{
 				track.loadStream();
@@ -484,6 +487,10 @@ public class TrackList implements Runnable
 		}
 		
 		try {
+			for(Track track : tracks)
+			{
+				track.loadStream();
+			}
 			File wavFile = new File(fileName);
 			ClippingInputStream outStream = new ClippingInputStream(this);
 			AudioSystem.write(outStream, AudioFileFormat.Type.WAVE, wavFile);
@@ -510,32 +517,32 @@ public class TrackList implements Runnable
 		return fileName;
 	}
 
-	private AudioFormat getHighestQualityFormat()
-	{
-		int numChannels = 1;
-		float highestBitRate = 11025;
-		int sampleSize = 8;
-		for(Track t : tracks)
-		{
-			AudioFormat f = t.getFormat();
-			if(f.getChannels() > numChannels)
-			{
-				numChannels = f.getChannels();
-			}
-
-			if(f.getFrameRate() > highestBitRate)
-			{
-				highestBitRate = f.getFrameRate();
-			}
-
-			if(f.getSampleSizeInBits() > sampleSize)
-			{
-				sampleSize = f.getSampleSizeInBits();
-			}
-		}
-
-		return new AudioFormat(highestBitRate, sampleSize, numChannels, true, false);
-	}
+//	private AudioFormat getHighestQualityFormat()
+//	{
+//		int numChannels = 1;
+//		float highestBitRate = 11025;
+//		int sampleSize = 8;
+//		for(Track t : tracks)
+//		{
+//			AudioFormat f = t.getFormat();
+//			if(f.getChannels() > numChannels)
+//			{
+//				numChannels = f.getChannels();
+//			}
+//
+//			if(f.getFrameRate() > highestBitRate)
+//			{
+//				highestBitRate = f.getFrameRate();
+//			}
+//
+//			if(f.getSampleSizeInBits() > sampleSize)
+//			{
+//				sampleSize = f.getSampleSizeInBits();
+//			}
+//		}
+//
+//		return new AudioFormat(highestBitRate, sampleSize, numChannels, true, false);
+//	}
 
 	public AudioFormat getTrackListFormat()
 	{
