@@ -281,7 +281,7 @@ public class Track implements Runnable
 				}
 				FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
 				float range = volumeMod.getMinimum();
-				range *= ((100.0 - this.intensity) / 100.0);
+				range *= Math.pow(((100.0 - this.intensity) / 100.0), 2.2); //adjust curve of how much intensity affects volume
 				volumeMod.setValue(range);
 				tracklist.updateActionListeners();
 				dataStream.setAmplitudeLog(range);
