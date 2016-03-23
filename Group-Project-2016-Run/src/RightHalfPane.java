@@ -45,8 +45,7 @@ public class RightHalfPane extends JPanel implements ActionListener {
 		PictureTimeScalePane timescale = new PictureTimeScalePane(tracklist, picpane);
 		horizScroll = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		horizScroll.setViewportView(timescale);
-		horizScroll.setMinimumSize(new Dimension(1,62));
-		//horizScroll.setPreferredSize(new Dimension(99999,60));
+		horizScroll.setMinimumSize(new Dimension(1,22));
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.LINE_START;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
