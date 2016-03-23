@@ -5,6 +5,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -74,6 +75,8 @@ public class Track implements Runnable
 		catch (Exception e)
 		{
 			isGood = false;
+		}
+		if (tracklist != null) {
 			tracklist.updateActionListeners();
 		}
 	}
@@ -103,10 +106,9 @@ public class Track implements Runnable
 		catch (Exception e)
 		{
 			isGood = false;
-
-			if (tracklist != null) {
-				tracklist.updateActionListeners();
-			}
+		}
+		if (tracklist != null) {
+			tracklist.updateActionListeners();
 		}
 	}
 	
@@ -148,19 +150,28 @@ public class Track implements Runnable
 		soundClip.stop();
 		while(soundClip.getFramePosition() != 0) soundClip.setFramePosition(0);
 		soundClip.start();
-
+		//new Thread(this);
 	}
 	
 	public void play()
 	{
+		if (!this.isGood()) {
+			ArrayList<String> failedNames = new ArrayList<String>();
+			for (Track t : tracklist.failedTracks()) {
+				failedNames.add(t.getFileName());
+			}
+			new FileNotFound(failedNames);
+			return;
+		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				JOptionPane pane = new JOptionPane("Preview...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION);
+				JOptionPane pane = new JOptionPane("Previewing Track...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				dialog = new JDialog((JFrame)null, "Preview", false);
 				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
 
@@ -170,14 +181,16 @@ public class Track implements Runnable
 						if(arg0.getPropertyName().equals("value"))
 						{
 							terminateSound = true;
-							dialog.dispose();	
 						}
 					}
-
 				});
 				dialog.add(pane);
 				dialog.addWindowListener(new WindowAdapter() {
 					public void windowClosed(WindowEvent ev) {
+						terminateSound = true;
+					}
+					
+					public void windowClosing(WindowEvent ev) {
 						terminateSound = true;
 					}
 				});
@@ -227,9 +240,11 @@ public class Track implements Runnable
 		this.fileName = fileName;
 		try
 		{
+			soundClip = AudioSystem.getClip();
 			loadStream();
 			loadClip();
 			isGood = true;
+			tracklist.updateActionListeners();
 		}
 		catch(Exception e) 
 		{
@@ -245,7 +260,8 @@ public class Track implements Runnable
 	
 	public double getLength()
 	{
-		if (this.isGood()) {
+		if (this.isGood()) 
+		{
 			return length;
 		}
 		return 0;
@@ -267,8 +283,8 @@ public class Track implements Runnable
 				dataStream.setAmplitudeLog(range);
 			}
 		}
-		catch (LineUnavailableException e) { }
-		catch (IOException e) { }
+		catch (LineUnavailableException e) {e.printStackTrace(); }
+		catch (IOException e) { e.printStackTrace();}
 	}
 	
 	public double getIntensity()
@@ -359,15 +375,19 @@ public class Track implements Runnable
 
 	private void loadClip()
 	{
-		if(soundClip.isOpen())
-			soundClip.close();
+		//if(soundClip.isOpen())
+		//	soundClip.close();
 		try 
 		{
-			soundClip.open(dataStream);
-			FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
-			float range = volumeMod.getMinimum();
-			range *= ((100.0 - this.intensity) / 100.0);
-			volumeMod.setValue(range);
+			if (dataStream != null) {
+				if (!soundClip.isOpen()){
+						soundClip.open(dataStream);
+				}
+				FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
+				float range = volumeMod.getMinimum();
+				range *= ((100.0 - this.intensity) / 100.0);
+				volumeMod.setValue(range);
+			}
 		} 
 		catch (LineUnavailableException e)
 		{
@@ -380,11 +400,12 @@ public class Track implements Runnable
 		soundClip.setFramePosition(0);
 	}
 	
-	private void loadStream() throws IOException, UnsupportedAudioFileException, Exception
+	public void loadStream() throws IOException, UnsupportedAudioFileException, Exception
 	{
 		if(dataStream != null)
 			dataStream.close();
 		dataStream = new AmplitudeAudioInputStream(getConvertedInputStream(AudioSystem.getAudioInputStream(new File(fileName))));
+		setIntensity(this.getIntensity());
 	}
 	
 	private AudioInputStream getConvertedInputStream(AudioInputStream s) throws Exception
@@ -409,13 +430,12 @@ public class Track implements Runnable
 	
 	private long getSampleLength(AudioInputStream s)
 	{
-		double frameLength = (double)s.getFrameLength() / (double)s.getFormat().getFrameSize();
-		if(s.getFormat().getFrameSize() == 4)
-			frameLength /= 2.0;
+		double frameLength = (double)s.getFrameLength();
+		if(s.getFormat().getSampleSizeInBits() == 32)//why????
+			frameLength /= 4;
 		double frameRate = (double) s.getFormat().getFrameRate();
 		double targetRate = (double) tracklist.getTrackListFormat().getFrameRate();
 		double ret = (targetRate / frameRate) * frameLength;
-		ret *= ((double)tracklist.getTrackListFormat().getChannels() / (double)s.getFormat().getChannels());
 		return (long)ret;
 	}
 	
@@ -446,6 +466,15 @@ public class Track implements Runnable
 
 				});
 				recordDialog.add(pane);
+				recordDialog.addWindowListener(new WindowAdapter() {
+					public void windowClosed(WindowEvent ev) {
+						recorder.stopRecord();
+					}
+					
+					public void windowClosing(WindowEvent ev) {
+						recorder.stopRecord();
+					}
+				});
 				recordDialog.pack();
 				recordDialog.setVisible(true);
 
@@ -531,6 +560,9 @@ class AudioRecorder implements Runnable
 			track.makeMeBad();
 			return;
 		}
+		if (save.exists()) {
+			save.delete();
+		}
 		temp.renameTo(save);
 		line.close();
 
@@ -544,11 +576,12 @@ class AudioRecorder implements Runnable
 		File delTemp = new File("temp.wav");
 		delTemp.delete();
 		tracklist.add(new Track(save.getAbsolutePath(), tracklist));
+		tracklist.updateActionListeners();
 	}
 
 	public void stopRecord()
 	{
-		if(line != null)
+		if(line != null && line.isRunning())
 		{
 			line.stop();
 		}

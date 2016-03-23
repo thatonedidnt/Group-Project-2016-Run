@@ -51,7 +51,7 @@ public class PictureTimeScalePane extends JPanel implements ActionListener, Scro
 	@Override
 	public Dimension getPreferredScrollableViewportSize() {
 		//int totalLength = (int)(tracklist.totalLength()*PicturePane.PIXELS_PER_SECOND);
-		return new Dimension(picpane.getWidth(), 60);
+		return new Dimension(picpane.getWidth(), 20);
 	}
 
 	@Override
@@ -76,6 +76,6 @@ public class PictureTimeScalePane extends JPanel implements ActionListener, Scro
 	
 	@Override
 	public Dimension getPreferredSize() {
-		return new Dimension(picpane.getWidth(), 60);
+		return new Dimension(picpane.getWidth(), 20);
 	}
 }

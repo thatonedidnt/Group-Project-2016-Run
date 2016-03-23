@@ -11,7 +11,7 @@ import javax.swing.JScrollPane;
 
 public class TrackTablePane extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1172621669112000413L;
-	private static final int BOTTOM_SCALE_HEIGHT = 70;
+	private static final int BOTTOM_SCALE_HEIGHT = 15;
 	
 	TrackTable trackTable;
 	JButton edit;

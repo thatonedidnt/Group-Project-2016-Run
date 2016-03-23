@@ -15,4 +15,7 @@ Done, needs testing: EditTrackDialog should disable the "End" radiobutton when "
 Done, needs testing: Make a separate name and filename for Tracks
 Done, needs testing: Make EditTrackDialog not close the whole program when only it is closed
 
-	get sound to work ffs
+Done, needs testing: get sound to work ffs
+
+
+Check spec compliance!

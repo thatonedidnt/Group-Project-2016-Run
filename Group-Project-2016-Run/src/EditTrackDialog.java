@@ -22,6 +22,8 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 	private JTextField text;
 	private JFileChooser fc;
 	private JSlider ISlider;
+	private String lastPathChooseFile;
+	
 	EditTrackDialog(Track track, TrackList list){
 		//trackID = track.getID();
 		backUpTrack = track;
@@ -62,11 +64,6 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		c.gridx = 2;
 		c.gridy = 0;
 		pane.add(chooser, c);
-		
-		fc = new JFileChooser();
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("WAV audio (*.wav)", "wav");
-		fc.addChoosableFileFilter(filter);
-		fc.setFileFilter(filter);
 		
 		JLabel relativeTrack = new JLabel ("Relative Track");
 		c.fill = GridBagConstraints.HORIZONTAL;
@@ -182,14 +179,18 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == chooser){ 
-			 int returnVal = fc.showOpenDialog(EditTrackDialog.this);
-	            if (returnVal == JFileChooser.APPROVE_OPTION) {
-	                File file = fc.getSelectedFile();
-	                text.setText(file.getAbsolutePath());
-	                backUpTrack.setFileName(file.getAbsolutePath());
-	            } else {
-	                text.setText("");
-	            }
+			fc = new JFileChooser(lastPathChooseFile);
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("WAV audio (*.wav)", "wav");
+			fc.addChoosableFileFilter(filter);
+			fc.setFileFilter(filter);
+			
+			int returnVal = fc.showOpenDialog(EditTrackDialog.this);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				lastPathChooseFile = file.getParent();
+				text.setText(file.getAbsolutePath());
+				backUpTrack.setFileName(file.getAbsolutePath());
+			}
 		}
 		if(e.getSource() == chooseTrack){ 
 			int relInd = chooseTrack.getSelectedIndex();

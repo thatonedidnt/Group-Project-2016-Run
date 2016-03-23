@@ -1,6 +1,10 @@
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +15,12 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.xml.parsers.*;
 import javax.xml.transform.Transformer;
@@ -29,7 +37,6 @@ class ClippingInputStream extends AudioInputStream
 	private List<Long> frameStartList;
 	private List<Track> trackList;
 	private long curSample;
-	private AudioFormat fmt;
 	
 	public ClippingInputStream(TrackList t) 
 	{
@@ -37,7 +44,6 @@ class ClippingInputStream extends AudioInputStream
 		sampleLength = t.totalLengthInSamples();
 		frameStartList = new ArrayList<Long>();
 		trackList = new ArrayList<Track>();
-		fmt = t.getTrackListFormat();
 		
 		for(int a=0;a<t.numTracks();a++)
 		{
@@ -62,38 +68,42 @@ class ClippingInputStream extends AudioInputStream
 		for(int a=0;a<trackList.size();a++)
 		{
 			Track t = trackList.get(a);
-			if(t.startSample() < (curSample + len) && curSample < t.startSample() + t.getLengthInSamples())
+			int frameSize = t.getFormat().getFrameSize();
+			if(t.startSample() * frameSize < (curSample + len) && curSample < (t.startSample() + t.getLengthInSamples()) * frameSize)
 			{
 				totalReads++;
 				long samplesToRead;
 				int offset = 0;
-				if(curSample < t.startSample())
+				if(curSample < t.startSample() * frameSize)
 				{
-					samplesToRead = (curSample + len) - t.startSample();
-					offset = (int)(t.startSample() - curSample);
+					samplesToRead = (curSample + len) - t.startSample() * frameSize;
+					offset = (int)((t.startSample() * frameSize) - curSample);
 				}
-				else if((curSample + len) > (t.startSample() + t.getLengthInSamples()))
+				else if((curSample + len) > (t.startSample() + t.getLengthInSamples()) * frameSize)
 				{
-					samplesToRead = (t.startSample() + t.getLengthInSamples()) - (curSample);
+					samplesToRead = (t.startSample() + t.getLengthInSamples()) * frameSize - (curSample);
 				}
 				else
 				{
 					samplesToRead = len;
 				}
 				t.getDataStream().read(singleRead, offset, (int)samplesToRead);
-				System.out.println(singleRead[0]);
-				for(int b=offset;b<len;b++)
+				for(int b=0;b<samplesToRead;b++)
 				{
-					byteSums[b] += singleRead[b - offset];
+					byteSums[b + offset] += singleRead[b + offset];
 				}
 				maxLen = Math.max((int)samplesToRead, maxLen);
 			}
 		}
 		for(int a=0;a<len;a++)
 		{
+			if(byteSums[a] > Byte.MAX_VALUE)
+				byteSums[a] = Byte.MAX_VALUE;
+			if(byteSums[a] < Byte.MIN_VALUE)
+				byteSums[a] = Byte.MIN_VALUE;
 			buffer[a] = (byte)(byteSums[a]);
 		}
-		curSample += (len / (fmt.getFrameSize()));
+		curSample += (len);
 		if(totalReads == 0)
 			return -1;
 		else
@@ -108,16 +118,39 @@ class ClippingInputStream extends AudioInputStream
 
 public class TrackList implements Runnable
 {
+	private class StopDialog extends JDialog implements ActionListener {
+		private static final long serialVersionUID = 6107977679622241260L;
+		
+		private TrackList list;
+		
+		StopDialog(JFrame frame, String text, boolean iDontKnowWhatThisIs, TrackList list) {
+			super(frame, text, iDontKnowWhatThisIs);
+			this.list = list;
+		}
+
+		@Override
+		public void actionPerformed(ActionEvent ev) {
+			if (ev.getActionCommand().equals("stopPlay")) {
+				list.terminateSound = true;
+				this.dispose();
+			}
+		}
+	}
+	
 	private static final Track START = new Track("",
 			100,
 			-1,
 			Track.START,
 			0,
 			null);
+
+	private String lastPathRecord = null;
 	
+	private StopDialog dialog;
 	private ArrayList<Track> tracks;
 	private ArrayList<ActionListener> actionlisteners;
 	private String fileName;
+	private JFrame parentFrame = null;
 
 	private AudioFormat format;
 
@@ -130,75 +163,9 @@ public class TrackList implements Runnable
 		format = new AudioFormat(44100, 16, 2, true, false);
 	}
 
-	/*
-	TrackList(String name) throws BadFileException, BadPathException {
-		tracks = new ArrayList<Track>();
-		actionlisteners = new ArrayList<ActionListener>();
-		try {
-			File scriptFile = new File(name);
-			DocumentBuilderFactory bFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = bFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(scriptFile);
-			if (doc.getDocumentElement().getNodeName().toLowerCase().equals("script")) {
-				NodeList nList = doc.getElementsByTagName("track");
-				for (int i = 0; i < nList.getLength(); ++i) {
-					Node currNode = nList.item(i);
-					if (currNode.getNodeType() == Node.ELEMENT_NODE) {
-						Element element = (Element)currNode;
-						String id = element.getAttribute("id");
-						String trackName = element.getElementsByTagName("filename").item(0).getTextContent();
-						String relativeTo = element.getElementsByTagName("relativeto").item(0).getTextContent();
-						String relativePos = element.getElementsByTagName("relativeposition").item(0).getTextContent();
-						String intensity = element.getElementsByTagName("intensity").item(0).getTextContent();
-
-						boolean startend = false;
-						if (relativePos.equals("start")) {
-							startend = Track.START;
-						}
-						else {
-							startend = Track.END;
-						}
-						Track track = new Track(
-								trackName,
-								Double.parseDouble(intensity),
-								Integer.parseInt(relativeTo),
-								startend,
-								Integer.parseInt(id),
-								this);
-						this.add(track);
-					}
-				}
-			}
-			else {
-				throw new BadFileException();
-			}
-		}
-		catch (ParserConfigurationException e) {
-			throw new BadFileException();
-		}
-		catch (SAXException e) {
-			throw new BadFileException();
-		}
-		catch (IOException e) {
-			throw new BadPathException();
-		}
-		format = getHighestQualityFormat();
-
-		int highestID = 1;
-
-		for(Track t : tracks)
-		{
-			if(t.getID() > highestID)
-				highestID = t.getID();
-		}
-
-		currentID = highestID;
-	}
-	 */
-
 	public void add(Track newTrack) {
 		tracks.add(newTrack);
-		this.format = getHighestQualityFormat();
+//		this.format = getHighestQualityFormat();
 		updateActionListeners();
 	}
 
@@ -292,43 +259,84 @@ public class TrackList implements Runnable
 			return;
 		}
 		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				JOptionPane pane = new JOptionPane("Playing Script...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
+				dialog = new StopDialog((JFrame)parentFrame, "Preview", false, TrackList.this);
+				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setResizable(false);
+				pane.addPropertyChangeListener(new PropertyChangeListener()
+				{
+
+					@Override
+					public void propertyChange(PropertyChangeEvent arg0)
+					{
+						if(arg0.getPropertyName().equals("value"))
+						{
+							terminateSound = true;
+						}
+					}
+				});
+				dialog.add(pane);
+				dialog.addWindowListener(new WindowAdapter() {
+					public void windowClosed(WindowEvent ev) {
+						terminateSound = true;
+					}
+					
+					public void windowClosing(WindowEvent ev) {
+						terminateSound = true;
+					}
+				});
+				dialog.pack();
+				dialog.setVisible(true);
+
+			}
+		});
+		Thread t = new Thread(this);
+		t.start();
+	}
+	
+	public void run() {
 		double currentTime = 0;
 		terminateSound = false;
-		Thread t = new Thread(this);
 
-		t.start();
-
-		long lastTime = System.currentTimeMillis();
-		ArrayList<Integer> playedIDs = new ArrayList<Integer>();
-
+		long beginTime = System.currentTimeMillis();
+		//ArrayList<Integer> playedIDs = new ArrayList<Integer>();
+		boolean[] playedAlready = new boolean[this.numTracks()];
+		
 		while(currentTime < totalLength() && !terminateSound)
 		{
-			currentTime += ((double)(System.currentTimeMillis() - lastTime)) / (1000.0);
-			lastTime = System.currentTimeMillis();
-			for(Track track : tracks)
-			{
-				if(track.startTime() < currentTime && playedIDs.indexOf(track.getID()) == -1)
-				{
-					playedIDs.add(track.getID());
-					track.playNoBlock();
+			//currentTime += ((double)(System.currentTimeMillis() - lastTime)) / (1000.0);
+			//lastTime = System.currentTimeMillis();
+			currentTime = (System.currentTimeMillis() - beginTime)/1000.0;
+			
+			for (int i = 0; i < this.numTracks(); ++i) {
+				if (!playedAlready[i] && (this.get(i).startTime() < currentTime)) {
+					playedAlready[i] = true;
+					Thread t = new Thread(this.get(i));
+					t.start();
 				}
 			}
 		}
-		t.interrupt();
 		for(Track track : tracks)
 		{
 			track.stop();
 		}
-		try 
+		for(Track track : tracks)
 		{
-			t.join();
-		} 
-		catch (InterruptedException e){}
-	}
-
-	public void run()
-	{
-		JOptionPane.showMessageDialog(null, "Full preview...");
+			try 
+			{
+				track.loadStream();
+			} 
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		dialog.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "stopPlay"));
 		terminateSound = true;
 	}
 
@@ -480,13 +488,29 @@ public class TrackList implements Runnable
 		}
 		
 		try {
+			for(Track track : tracks)
+			{
+				track.loadStream();
+			}
 			File wavFile = new File(fileName);
 			ClippingInputStream outStream = new ClippingInputStream(this);
 			AudioSystem.write(outStream, AudioFileFormat.Type.WAVE, wavFile);
+			for(Track track : tracks)
+			{
+				track.loadStream();
+			}
 		} 
-		catch (IOException e)
+		catch(IOException e)
 		{
 			throw new BadPathException();
+		} 
+		catch(UnsupportedAudioFileException e) 
+		{
+			e.printStackTrace();
+		}
+		catch(Exception e) 
+		{
+			e.printStackTrace();
 		}
 	}
 	
@@ -494,32 +518,32 @@ public class TrackList implements Runnable
 		return fileName;
 	}
 
-	private AudioFormat getHighestQualityFormat()
-	{
-		int numChannels = 1;
-		float highestBitRate = 11025;
-		int sampleSize = 8;
-		for(Track t : tracks)
-		{
-			AudioFormat f = t.getFormat();
-			if(f.getChannels() > numChannels)
-			{
-				numChannels = f.getChannels();
-			}
-
-			if(f.getFrameRate() > highestBitRate)
-			{
-				highestBitRate = f.getFrameRate();
-			}
-
-			if(f.getSampleSizeInBits() > sampleSize)
-			{
-				sampleSize = f.getSampleSizeInBits();
-			}
-		}
-
-		return new AudioFormat(highestBitRate, sampleSize, numChannels, true, false);
-	}
+//	private AudioFormat getHighestQualityFormat()
+//	{
+//		int numChannels = 1;
+//		float highestBitRate = 11025;
+//		int sampleSize = 8;
+//		for(Track t : tracks)
+//		{
+//			AudioFormat f = t.getFormat();
+//			if(f.getChannels() > numChannels)
+//			{
+//				numChannels = f.getChannels();
+//			}
+//
+//			if(f.getFrameRate() > highestBitRate)
+//			{
+//				highestBitRate = f.getFrameRate();
+//			}
+//
+//			if(f.getSampleSizeInBits() > sampleSize)
+//			{
+//				sampleSize = f.getSampleSizeInBits();
+//			}
+//		}
+//
+//		return new AudioFormat(highestBitRate, sampleSize, numChannels, true, false);
+//	}
 
 	public AudioFormat getTrackListFormat()
 	{
@@ -537,13 +561,21 @@ public class TrackList implements Runnable
 	
 	public File saveDialog(String fileExtension, String extensionDescription)
 	{
-		JFileChooser open = new JFileChooser();
+		JFileChooser open = new JFileChooser(lastPathRecord);
 		open.setFileFilter(new FileNameExtensionFilter(extensionDescription, fileExtension));
-		open.showSaveDialog(null);
-		if(!open.getSelectedFile().getAbsolutePath().endsWith(".wav"))
-			return new File(open.getSelectedFile().getAbsolutePath() + "." + fileExtension);
-		else
-			return new File(open.getSelectedFile().getAbsolutePath());
+		int retval = open.showSaveDialog(null);
+		if (retval == JFileChooser.APPROVE_OPTION) {
+			lastPathRecord = open.getSelectedFile().getParent();
+		}
+		try {
+			if(!open.getSelectedFile().getAbsolutePath().endsWith(".wav"))
+				return new File(open.getSelectedFile().getAbsolutePath() + "." + fileExtension);
+			else
+				return new File(open.getSelectedFile().getAbsolutePath());
+		}
+		catch (NullPointerException e) {
+			return null;
+		}
 			
 	}
 	
@@ -559,5 +591,9 @@ public class TrackList implements Runnable
 			}
 		}
 		return -1;
+	}
+	
+	public void setParentFrame(JFrame frame) {
+		this.parentFrame = frame;
 	}
 }
