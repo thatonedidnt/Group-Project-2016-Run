@@ -77,7 +77,7 @@ class ClippingInputStream extends AudioInputStream
 				if(curSample < t.startSample() * frameSize)
 				{
 					samplesToRead = (curSample + len) - t.startSample() * frameSize;
-					offset = (int)(t.startSample() - curSample);
+					offset = (int)((t.startSample() * frameSize) - curSample);
 				}
 				else if((curSample + len) > (t.startSample() + t.getLengthInSamples()) * frameSize)
 				{
