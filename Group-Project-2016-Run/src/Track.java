@@ -252,10 +252,9 @@ public class Track implements Runnable
 	
 	public double getLength()
 	{
-		if (this.isGood()) {
-			//return length;
-			AudioFormat fmt = dataStream.getFormat();
-			return dataStream.getFrameLength()/fmt.getFrameRate();
+		if (this.isGood()) 
+		{
+			return length;
 		}
 		return 0;
 	}
