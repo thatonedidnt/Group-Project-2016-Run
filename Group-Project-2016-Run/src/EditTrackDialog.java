@@ -159,7 +159,6 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		pane.add(cancel, c);
 			
 		this.add(pane);
-		this.setAlwaysOnTop(true);
 		this.pack();
 		SwingUtilities.getRootPane(save).setDefaultButton(save);
 		this.setVisible(true);

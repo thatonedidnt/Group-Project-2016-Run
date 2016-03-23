@@ -262,7 +262,7 @@ public class TrackList implements Runnable
 			@Override
 			public void run()
 			{
-				JOptionPane pane = new JOptionPane("Playing Script...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION);
+				JOptionPane pane = new JOptionPane("Playing Script...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				dialog = new StopDialog((JFrame)parentFrame, "Preview", false, TrackList.this);
 				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 				dialog.setResizable(false);

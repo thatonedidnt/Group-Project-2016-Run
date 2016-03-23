@@ -5,6 +5,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -154,12 +155,20 @@ public class Track implements Runnable
 	
 	public void play()
 	{
+		if (!this.isGood()) {
+			ArrayList<String> failedNames = new ArrayList<String>();
+			for (Track t : tracklist.failedTracks()) {
+				failedNames.add(t.getFileName());
+			}
+			new FileNotFound(failedNames);
+			return;
+		}
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				JOptionPane pane = new JOptionPane("Preview...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION);
+				JOptionPane pane = new JOptionPane("Previewing Track...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				dialog = new JDialog((JFrame)null, "Preview", false);
 				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 				dialog.setResizable(false);
