@@ -143,6 +143,8 @@ public class TrackList implements Runnable
 			Track.START,
 			0,
 			null);
+
+	private String lastPathRecord = null;
 	
 	private StopDialog dialog;
 	private ArrayList<Track> tracks;
@@ -559,9 +561,12 @@ public class TrackList implements Runnable
 	
 	public File saveDialog(String fileExtension, String extensionDescription)
 	{
-		JFileChooser open = new JFileChooser();
+		JFileChooser open = new JFileChooser(lastPathRecord);
 		open.setFileFilter(new FileNameExtensionFilter(extensionDescription, fileExtension));
-		open.showSaveDialog(null);
+		int retval = open.showSaveDialog(null);
+		if (retval == JFileChooser.APPROVE_OPTION) {
+			lastPathRecord = open.getSelectedFile().getParent();
+		}
 		try {
 			if(!open.getSelectedFile().getAbsolutePath().endsWith(".wav"))
 				return new File(open.getSelectedFile().getAbsolutePath() + "." + fileExtension);

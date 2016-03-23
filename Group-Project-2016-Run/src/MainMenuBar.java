@@ -8,13 +8,22 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class MainMenuBar extends JMenuBar implements ActionListener{
 	private static final long serialVersionUID = -8709557995298923151L;
 	
-	JMenu menuFile, menuRecording;
-	JMenuItem itemOpen, itemNew, itemSaveAs, itemQuit;
-	JMenuItem itemNewTrack, itemCreateRecording, itemPreview, itemExport;
-	TrackList tracklist;
+	private JMenu menuFile, menuRecording;
+	private JMenuItem itemOpen, itemNew, itemSaveAs, itemQuit;
+	private JMenuItem itemNewTrack, itemCreateRecording, itemPreview, itemExport;
+	private TrackList tracklist;
+	private String lastPathOpen;
+	private String lastPathNew;
+	private String lastPathSaveAs;
+	private String lastPathExport;
 
 	MainMenuBar(TrackList trackList){
 		super();
+		
+		lastPathOpen = null;
+		lastPathNew = null;
+		lastPathSaveAs = null;
+		lastPathExport = null;
 
 		menuFile=new JMenu("File");
 
@@ -85,13 +94,14 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == itemOpen){								//open
-			JFileChooser fc = new JFileChooser();
+			JFileChooser fc = new JFileChooser(lastPathOpen);
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("Script files (*.dbts, *.xml)", "dbts", "xml");
 			fc.addChoosableFileFilter(filter);
 			fc.setFileFilter(filter);
 			int returnVal = fc.showDialog(itemOpen, "Open...");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
+				lastPathOpen = file.getParent();
 				try {
 					tracklist.setFileName(file.getAbsolutePath());
 					this.enableButtons();
@@ -105,12 +115,13 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 			}
 		}
 		if(e.getSource() == itemNew){								//new
-			JFileChooser fc = new JFileChooser();
+			JFileChooser fc = new JFileChooser(lastPathNew);
 			FileNameExtensionFilter dbtsfilter = new FileNameExtensionFilter("Script files (*.dbts)", "dbts");
 			fc.setFileFilter(dbtsfilter);
 			int returnVal = fc.showDialog(itemOpen, "New...");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
+				lastPathNew = file.getParent();
 				if (!file.getAbsolutePath().matches(".*[dD][bB][tT][sS]")) {
 					file = new File(file.getAbsolutePath()+".dbts");
 				}
@@ -131,12 +142,14 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 			}
 		}
 		if(e.getSource() == itemSaveAs){							//save as
-			JFileChooser fc = new JFileChooser();
+			JFileChooser fc = new JFileChooser(lastPathSaveAs);
 			FileNameExtensionFilter dbtsfilter = new FileNameExtensionFilter("Script files (*.dbts)", "dbts");
 			fc.setFileFilter(dbtsfilter);
+			System.out.println(lastPathSaveAs);
 			int returnVal = fc.showDialog(itemOpen, "Save As...");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
+				lastPathSaveAs = file.getParent();
 				if (!file.getAbsolutePath().matches(".*[dD][bB][tT][sS]")) {
 					file = new File(file.getAbsolutePath()+".dbts");
 				}
@@ -183,12 +196,13 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 			tracklist.play();
 		}
 		if(e.getSource() == itemExport){							//export
-			JFileChooser fc = new JFileChooser();
+			JFileChooser fc = new JFileChooser(lastPathExport);
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("WAV audio", "wav");
 			fc.setFileFilter(filter);
 			int returnVal = fc.showDialog(itemOpen, "Export...");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
+				lastPathExport = file.getParent();
 				if (!file.getAbsolutePath().matches(".*[wW][aA][vV]")) {
 					file = new File(file.getAbsolutePath()+".wav");
 				}
