@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.jgrapht.DirectedGraph;
+import org.tritonus.dsp.ais.AmplitudeAudioInputStream;
+import org.tritonus.share.sampled.convert.TSynchronousFilteredAudioInputStream;
+
 public class LaunchJRE {
 
 	private static boolean isWindows() {
@@ -50,6 +54,13 @@ public class LaunchJRE {
 		return process.waitFor();
 	}
 
+	private static String getLibPath(Class c) {
+		return new java.io.File(c.getProtectionDomain()
+				  .getCodeSource()
+				  .getLocation()
+				  .getPath()).getAbsolutePath();
+	}
+	
 	public static void main(String[] args) {
 		try {
 			String jarPath = new java.io.File(MainScreen.class.getProtectionDomain()
@@ -57,17 +68,25 @@ public class LaunchJRE {
 					  .getLocation()
 					  .getPath())
 					.getAbsolutePath();
-			System.out.println(jarPath);
 			ArrayList<String> cmdarray = new ArrayList<String>();
 			cmdarray.add(getJreExecutable().toString());
-			cmdarray.add("-cp "+jarPath);
-			cmdarray.add("MainScreen");
-			int retValue = launch(cmdarray);
-			if (retValue != 0) {
-				System.err.println("Error code " + retValue);
+			if (LaunchJRE.class.getResource("LaunchJRE.class").toString().substring(0,3).equals("jar")) {
+				cmdarray.add("-cp");
+				cmdarray.add(jarPath);
 			}
-			System.out.println(getJreExecutable().toString());
-			System.out.println("OK");
+			else {
+				String libPath = new java.io.File(AmplitudeAudioInputStream.class.getProtectionDomain()
+						  .getCodeSource()
+						  .getLocation()
+						  .getPath()).getAbsolutePath();
+				libPath += ";"+getLibPath(TSynchronousFilteredAudioInputStream.class);
+				libPath += ";"+getLibPath(DirectedGraph.class);
+				cmdarray.add("-cp");
+				cmdarray.add(jarPath+";"+libPath);
+			}
+			cmdarray.add("-Xmx8g");
+			cmdarray.add("MainScreen");
+			launch(cmdarray);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
