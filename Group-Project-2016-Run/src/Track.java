@@ -560,6 +560,9 @@ class AudioRecorder implements Runnable
 			track.makeMeBad();
 			return;
 		}
+		if (save.exists()) {
+			save.delete();
+		}
 		temp.renameTo(save);
 		line.close();
 

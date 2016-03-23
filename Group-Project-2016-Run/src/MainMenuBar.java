@@ -160,7 +160,20 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
 				Track newtrack = new Track(file.getAbsolutePath(), tracklist);
+				int latestRelID = 0;
+				double latestEnd = 0;
+				for (Track t : tracklist.getTracks()) {
+					if (t.startTime()+t.getLength() > latestEnd) {
+						latestEnd = t.startTime()+t.getLength();
+						latestRelID = t.getID();
+					}
+				}
 				tracklist.add(newtrack);
+				if (latestRelID > 0) {
+					tracklist.get(tracklist.numTracks()-1).setRelativeTo(latestRelID);
+					tracklist.get(tracklist.numTracks()-1).setStartEnd(Track.END);
+				}
+				new EditTrackDialog(tracklist.get(tracklist.numTracks()-1),tracklist);
 			}
 		}
 		if(e.getSource() == itemCreateRecording){					//create recording

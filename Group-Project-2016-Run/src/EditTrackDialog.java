@@ -182,14 +182,12 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == chooser){ 
-			 int returnVal = fc.showOpenDialog(EditTrackDialog.this);
-	            if (returnVal == JFileChooser.APPROVE_OPTION) {
-	                File file = fc.getSelectedFile();
-	                text.setText(file.getAbsolutePath());
-	                backUpTrack.setFileName(file.getAbsolutePath());
-	            } else {
-	                text.setText("");
-	            }
+			int returnVal = fc.showOpenDialog(EditTrackDialog.this);
+			if (returnVal == JFileChooser.APPROVE_OPTION) {
+				File file = fc.getSelectedFile();
+				text.setText(file.getAbsolutePath());
+				backUpTrack.setFileName(file.getAbsolutePath());
+			}
 		}
 		if(e.getSource() == chooseTrack){ 
 			int relInd = chooseTrack.getSelectedIndex();

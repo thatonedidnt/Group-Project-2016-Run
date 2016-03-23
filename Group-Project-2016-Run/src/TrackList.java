@@ -562,10 +562,15 @@ public class TrackList implements Runnable
 		JFileChooser open = new JFileChooser();
 		open.setFileFilter(new FileNameExtensionFilter(extensionDescription, fileExtension));
 		open.showSaveDialog(null);
-		if(!open.getSelectedFile().getAbsolutePath().endsWith(".wav"))
-			return new File(open.getSelectedFile().getAbsolutePath() + "." + fileExtension);
-		else
-			return new File(open.getSelectedFile().getAbsolutePath());
+		try {
+			if(!open.getSelectedFile().getAbsolutePath().endsWith(".wav"))
+				return new File(open.getSelectedFile().getAbsolutePath() + "." + fileExtension);
+			else
+				return new File(open.getSelectedFile().getAbsolutePath());
+		}
+		catch (NullPointerException e) {
+			return null;
+		}
 			
 	}
 	
