@@ -161,72 +161,6 @@ public class TrackList implements Runnable
 		format = new AudioFormat(44100, 16, 2, true, false);
 	}
 
-	/*
-	TrackList(String name) throws BadFileException, BadPathException {
-		tracks = new ArrayList<Track>();
-		actionlisteners = new ArrayList<ActionListener>();
-		try {
-			File scriptFile = new File(name);
-			DocumentBuilderFactory bFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuilder = bFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(scriptFile);
-			if (doc.getDocumentElement().getNodeName().toLowerCase().equals("script")) {
-				NodeList nList = doc.getElementsByTagName("track");
-				for (int i = 0; i < nList.getLength(); ++i) {
-					Node currNode = nList.item(i);
-					if (currNode.getNodeType() == Node.ELEMENT_NODE) {
-						Element element = (Element)currNode;
-						String id = element.getAttribute("id");
-						String trackName = element.getElementsByTagName("filename").item(0).getTextContent();
-						String relativeTo = element.getElementsByTagName("relativeto").item(0).getTextContent();
-						String relativePos = element.getElementsByTagName("relativeposition").item(0).getTextContent();
-						String intensity = element.getElementsByTagName("intensity").item(0).getTextContent();
-
-						boolean startend = false;
-						if (relativePos.equals("start")) {
-							startend = Track.START;
-						}
-						else {
-							startend = Track.END;
-						}
-						Track track = new Track(
-								trackName,
-								Double.parseDouble(intensity),
-								Integer.parseInt(relativeTo),
-								startend,
-								Integer.parseInt(id),
-								this);
-						this.add(track);
-					}
-				}
-			}
-			else {
-				throw new BadFileException();
-			}
-		}
-		catch (ParserConfigurationException e) {
-			throw new BadFileException();
-		}
-		catch (SAXException e) {
-			throw new BadFileException();
-		}
-		catch (IOException e) {
-			throw new BadPathException();
-		}
-		format = getHighestQualityFormat();
-
-		int highestID = 1;
-
-		for(Track t : tracks)
-		{
-			if(t.getID() > highestID)
-				highestID = t.getID();
-		}
-
-		currentID = highestID;
-	}
-	 */
-
 	public void add(Track newTrack) {
 		tracks.add(newTrack);
 		this.format = getHighestQualityFormat();
@@ -331,6 +265,7 @@ public class TrackList implements Runnable
 				JOptionPane pane = new JOptionPane("Playing Script...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION);
 				dialog = new StopDialog((JFrame)parentFrame, "Preview", false, TrackList.this);
 				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setResizable(false);
 				dialog.setAlwaysOnTop(true);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{

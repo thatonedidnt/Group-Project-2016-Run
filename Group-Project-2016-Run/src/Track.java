@@ -163,6 +163,7 @@ public class Track implements Runnable
 				dialog = new JDialog((JFrame)null, "Preview", false);
 				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 				dialog.setAlwaysOnTop(true);
+				dialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
 
@@ -252,7 +253,9 @@ public class Track implements Runnable
 	public double getLength()
 	{
 		if (this.isGood()) {
-			return length;
+			//return length;
+			AudioFormat fmt = dataStream.getFormat();
+			return dataStream.getFrameLength()/fmt.getFrameRate();
 		}
 		return 0;
 	}
