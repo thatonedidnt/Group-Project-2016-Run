@@ -4,6 +4,7 @@ Should be fixed now, needs testing: Playing results in an unclosable dialog box
 	Recorded Tracks have incorrect lengths
 Should be fixed now, needs testing: When files are changed with Choose File, the other things aren't updated, error doesn't go away
 Actually untrue. my mistake: Tracks return incorrect lengths
+	Playing dialog stays above other programs' windows (it should not)
 	
 Should be fixed now, needs testing: Sometimes get this when trying to setIntensity()
 Exception in thread "AWT-EventQueue-0" java.lang.IllegalArgumentException: Unsupported control type: Master Gain
