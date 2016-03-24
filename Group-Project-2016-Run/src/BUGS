@@ -1,6 +1,6 @@
 List of known bugs:
-	Playing results in an unclosable dialog box
-	Exports are silent
+Should be fixed now, needs testing: Playing results in an unclosable dialog box
+Should be fixed now, needs testing: Exports are silent
 Actually untrue. my mistake: Tracks return incorrect lengths
 	
 Should be fixed now, needs testing: Sometimes get this when trying to setIntensity()

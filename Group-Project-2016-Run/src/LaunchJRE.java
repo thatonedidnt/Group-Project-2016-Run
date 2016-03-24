@@ -54,7 +54,7 @@ public class LaunchJRE {
 		return process.waitFor();
 	}
 
-	private static String getLibPath(Class c) {
+	private static String getLibPath(Class<?> c) {
 		return new java.io.File(c.getProtectionDomain()
 				  .getCodeSource()
 				  .getLocation()
