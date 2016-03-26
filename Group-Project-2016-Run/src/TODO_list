@@ -32,7 +32,7 @@ Done: FileNotFound
 Done: LaunchJRE
 Done: MainMenuBar
 Done: MainScreen
-	PicturePane
+Done: PicturePane
 	PictureTimeScalePane
 Done: RightHalfPane
 	Track
