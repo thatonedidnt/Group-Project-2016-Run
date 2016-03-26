@@ -39,7 +39,7 @@ public class MainScreen extends JFrame implements ActionListener {
 		list.setParentFrame(this);
 		
 		mainFrame.pack();
-		//mainFrame.setExtendedState(mainFrame.getExtendedState()|JFrame.MAXIMIZED_BOTH);
+		mainFrame.setExtendedState(mainFrame.getExtendedState()|JFrame.MAXIMIZED_BOTH);
 		mainFrame.setVisible(true);
 	}
 	

@@ -19,7 +19,7 @@ public class LaunchJRE {
 		return os.startsWith("windows");
 	}
 
-	public static File getJreExecutable() throws FileNotFoundException {
+	private static File getJreExecutable() throws FileNotFoundException {
 		String jreDirectory = System.getProperty("java.home");
 		if (jreDirectory == null) {
 			throw new IllegalStateException("java.home");
@@ -36,7 +36,7 @@ public class LaunchJRE {
 		return exe;
 	}
 
-	public static int launch(ArrayList<String> cmdarray) throws IOException,
+	private static int launch(ArrayList<String> cmdarray) throws IOException,
 	InterruptedException {
 		byte[] buffer = new byte[1024];
 
