@@ -37,7 +37,10 @@ public class PictureTimeScalePane extends JPanel implements ActionListener, Scro
 		g.fillRect(0, 0, totalLength, 2);
 		for (int i = 5; i < totalLength/PicturePane.PIXELS_PER_SECOND; i += SCALE_INTERVAL) {
 			g.fillRect(i*PicturePane.PIXELS_PER_SECOND, 2, 2, 5);
-			g.drawString(Integer.toString(i), i*PicturePane.PIXELS_PER_SECOND+3, 12);
+			int minutes = i/60;
+			int seconds = i%60;
+			String timeString = Integer.toString(minutes)+":"+String.format("%02d", seconds);
+			g.drawString(timeString, i*PicturePane.PIXELS_PER_SECOND+3, 12);
 		}
 	}
 

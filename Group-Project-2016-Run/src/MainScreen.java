@@ -34,13 +34,13 @@ public class MainScreen extends JFrame implements ActionListener {
 		
 		JScrollBar TrackTableVertBar = trackTablePane.getTrackTableScrollPane().getVerticalScrollBar();
 		JScrollBar PicturePaneVertBar = righthalfpane.getVertScrollPane().getVerticalScrollBar();
-		TrackTableVertBar.setModel(PicturePaneVertBar.getModel());
+		PicturePaneVertBar.setModel(TrackTableVertBar.getModel());
 		
 		list.setParentFrame(this);
 		
 		mainFrame.pack();
+		//mainFrame.setExtendedState(mainFrame.getExtendedState()|JFrame.MAXIMIZED_BOTH);
 		mainFrame.setVisible(true);
-		mainFrame.setExtendedState(mainFrame.getExtendedState()|JFrame.MAXIMIZED_BOTH);
 	}
 	
 	

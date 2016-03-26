@@ -29,7 +29,7 @@ public class PicturePane extends JPanel implements ActionListener, MouseListener
 				RenderingHints.KEY_TEXT_ANTIALIASING,
 				RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 		this.setSize(new Dimension((int)(list.totalLength()*PIXELS_PER_SECOND)+200, list.numTracks()*IMAGE_HEIGHT + SCALE_SPACING));
-		this.setPreferredSize(new Dimension((int)(list.totalLength()*PIXELS_PER_SECOND)+200, list.numTracks()*IMAGE_HEIGHT + SCALE_SPACING));
+		this.setPreferredSize(new Dimension((int)(list.totalLength()*PIXELS_PER_SECOND)+201, list.numTracks()*IMAGE_HEIGHT + SCALE_SPACING-14));
 		g.setColor(Color.BLACK);
 		
 		for (int i=0; i< list.numTracks(); i++) {

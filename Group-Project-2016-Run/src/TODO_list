@@ -20,6 +20,8 @@ Done, needs testing: get sound to work ffs
 	Restrict size of EditTrackDialog
 	Check if FileNotFound and other dialogs are being spawned at the right times
 	Reword FileNotFound's message
+	Change timeline to minutes and seconds. This is important! It is a specification.
+Looks like this is impossible: Fix glitchiness in TrackTablePane vertical scrolling
 
 
 	Check spec compliance!

@@ -65,7 +65,7 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 		popup.add(delete);
 		
 		scrollpane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		
+		scrollpane.getVerticalScrollBar().setUnitIncrement(8);
 		this.setLayout(new BorderLayout());
 		
 		add(scrollpane, BorderLayout.CENTER);

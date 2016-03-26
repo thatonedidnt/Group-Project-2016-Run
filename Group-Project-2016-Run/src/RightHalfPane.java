@@ -65,7 +65,7 @@ public class RightHalfPane extends JPanel implements ActionListener {
 		JScrollBar TimeScaleScrollBar = horizScroll.getHorizontalScrollBar();
 		TimeScaleScrollBar.setModel(PicturePaneScrollBar.getModel());
 		
-		JLabel units = new JLabel("Seconds");
+		JLabel units = new JLabel("Time (MM:SS)");
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.LINE_START;
 		gbc.gridx = 0;
