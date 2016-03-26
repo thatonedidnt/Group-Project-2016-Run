@@ -8,7 +8,7 @@ Done, needs testing: Find out how to prevent loops in relative IDs
 Done, needs testing: Handle removal correctly
 Done, needs testing: Update all JFileChoosers to only select certain file types
 Done, needs testing: Make the PicturePane repaint itself when things change
-Apparently should be fixed when sound works: Make sensible defaults in Track
+Done, needs testing: Make sensible defaults in Track
 Done, needs testing: When EditTrackDialog opens, make the selected values mirror the already existing ones
 Done, needs testing: EditTrackDialog should not be able to make a Track relative to itself
 Done, needs testing: EditTrackDialog should disable the "End" radiobutton when "Start" is selected
