@@ -15,9 +15,9 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 	
 	private Track currentTrack;
 	private Track backUpTrack;
-	private TrackList list;
 	private JButton chooser, preview, save, cancel;
 	private JRadioButton beginning, end;
+	private ArrayList<TrackForwarder> comboItems;
 	private JComboBox<TrackForwarder> chooseTrack;
 	private JTextField text;
 	private JFileChooser fc;
@@ -25,10 +25,10 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 	private String lastPathChooseFile;
 	
 	EditTrackDialog(Track track, TrackList list){
-		//trackID = track.getID();
+		super();
+		
 		backUpTrack = track;
 		currentTrack = track;
-		this.list = list;
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
 		this.setResizable(false);
 		try { 
@@ -71,14 +71,14 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		c.gridy = 1;
 		pane.add(relativeTrack, c);
 		
-		ArrayList<TrackForwarder> comboItems = new ArrayList<TrackForwarder>();
+		comboItems = new ArrayList<TrackForwarder>();
 		comboItems.add(new TrackForwarder(null, "Start"));
 		for (Track t : list.getTracks()) {
 			if ((t == currentTrack) || currentTrack.willBeCyclic(t.getID())) continue;
 			comboItems.add(new TrackForwarder(t, t.getShortFileName()));
 		}
 		chooseTrack = new JComboBox<TrackForwarder>(comboItems.toArray(new TrackForwarder[0])); 
-		chooseTrack.setSelectedIndex(mapIndexToComboList(list.getIndexByID(currentTrack.getRelativeID())));
+		chooseTrack.setSelectedIndex(mapIDToComboList(currentTrack.getRelativeID()));
 		chooseTrack.addActionListener(this);
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = 1;
@@ -171,9 +171,11 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		this.setLocationRelativeTo(null);
 	}
 	
-	private int mapIndexToComboList(int index) {
-		if (index + 1 > list.getIndexByID(currentTrack.getID())) return index;
-		return index + 1;
+	private int mapIDToComboList(int id) {
+		for (int i = 0; i < comboItems.size(); ++i) {
+			if (comboItems.get(i).getTrack().getID() == id) return i;
+		}
+		return -1;
 	}
 	
 	@Override
@@ -222,12 +224,6 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 			currentTrack.setRelativeTo(backUpTrack.getRelativeID());
 			currentTrack.setStartEnd(backUpTrack.getStartEnd());
 			
-			/*
-			Track track = list.get(trackID);
-			track.setIntensity(currentTrack.getIntensity());
-			track.setRelativeTo(relativeID);
-			track.setStartEnd(currentTrack.getStartEnd());
-			*/
 			this.setVisible(false);
 			this.dispose();
 			

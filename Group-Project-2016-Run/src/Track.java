@@ -150,7 +150,6 @@ public class Track implements Runnable
 		soundClip.stop();
 		while(soundClip.getFramePosition() != 0) soundClip.setFramePosition(0);
 		soundClip.start();
-		//new Thread(this);
 	}
 	
 	public void play()
@@ -379,8 +378,6 @@ public class Track implements Runnable
 
 	private void loadClip()
 	{
-		//if(soundClip.isOpen())
-		//	soundClip.close();
 		try 
 		{
 			if (dataStream != null) {
@@ -443,7 +440,7 @@ public class Track implements Runnable
 		return (long)ret;
 	}
 	
-	public void record() throws LineUnavailableException, Exception
+	private void record() throws LineUnavailableException, Exception
 	{
 		Thread t = new Thread(recorder);
 		t.start();

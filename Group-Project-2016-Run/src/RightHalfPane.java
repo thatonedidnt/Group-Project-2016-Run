@@ -76,7 +76,7 @@ public class RightHalfPane extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent ev) {
 		if (ev.getActionCommand().equals("updateScript")) {
-			//this.revalidate();
+			//note: this implies RightHalfPane must always have a parent
 			this.getParent().getParent().revalidate();
 		}
 	}

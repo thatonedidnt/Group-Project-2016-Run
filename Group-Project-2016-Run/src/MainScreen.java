@@ -35,7 +35,6 @@ public class MainScreen extends JFrame implements ActionListener {
 		JScrollBar TrackTableVertBar = trackTablePane.getTrackTableScrollPane().getVerticalScrollBar();
 		JScrollBar PicturePaneVertBar = righthalfpane.getVertScrollPane().getVerticalScrollBar();
 		TrackTableVertBar.setModel(PicturePaneVertBar.getModel());
-		//timescalescroller.getVerticalScrollBar().setModel(((MainScreen)this.getParent()).getTrackTableScrollPane().getVerticalScrollBar().getModel());
 		
 		list.setParentFrame(this);
 		
@@ -55,9 +54,5 @@ public class MainScreen extends JFrame implements ActionListener {
 		if (ev.getActionCommand().equals("updateScript")) {
 			mainFrame.setTitle(list.getFileName()+" - Dubbing Tool");
 		}
-	}
-	
-	public JScrollPane getTrackTableScrollPane() {
-		return trackTablePane.getTrackTableScrollPane();
 	}
 }

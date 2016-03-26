@@ -147,7 +147,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 			JFileChooser fc = new JFileChooser(lastPathSaveAs);
 			FileNameExtensionFilter dbtsfilter = new FileNameExtensionFilter("Script files (*.dbts)", "dbts");
 			fc.setFileFilter(dbtsfilter);
-			System.out.println(lastPathSaveAs);
 			int returnVal = fc.showDialog(itemOpen, "Save As...");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();

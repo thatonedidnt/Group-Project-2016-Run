@@ -14,8 +14,12 @@ Done, needs testing: EditTrackDialog should not be able to make a Track relative
 Done, needs testing: EditTrackDialog should disable the "End" radiobutton when "Start" is selected
 Done, needs testing: Make a separate name and filename for Tracks
 Done, needs testing: Make EditTrackDialog not close the whole program when only it is closed
-
 Done, needs testing: get sound to work ffs
 
+	Restrict size of FileNotFound
+	Restrict size of EditTrackDialog
+	Check if FileNotFound and other dialogs are being spawned at the right times
+	Reword FileNotFound's message
 
-Check spec compliance!
+
+	Check spec compliance!

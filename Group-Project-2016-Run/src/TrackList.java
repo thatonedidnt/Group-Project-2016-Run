@@ -165,7 +165,6 @@ public class TrackList implements Runnable
 
 	public void add(Track newTrack) {
 		tracks.add(newTrack);
-//		this.format = getHighestQualityFormat();
 		updateActionListeners();
 	}
 
@@ -268,7 +267,6 @@ public class TrackList implements Runnable
 			{
 				JOptionPane pane = new JOptionPane("Playing Script...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				dialog = new StopDialog((JFrame)parentFrame, "Preview", false, TrackList.this);
-				//dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 				dialog.setAlwaysOnTop(true);
 				dialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
@@ -309,7 +307,6 @@ public class TrackList implements Runnable
 		terminateSound = false;
 
 		long beginTime = System.currentTimeMillis();
-		//ArrayList<Integer> playedIDs = new ArrayList<Integer>();
 		boolean[] playedAlready = new boolean[this.numTracks()];
 		
 		while(currentTime < totalLength() && !terminateSound)
@@ -532,33 +529,6 @@ public class TrackList implements Runnable
 	public String getFileName() {
 		return fileName;
 	}
-
-//	private AudioFormat getHighestQualityFormat()
-//	{
-//		int numChannels = 1;
-//		float highestBitRate = 11025;
-//		int sampleSize = 8;
-//		for(Track t : tracks)
-//		{
-//			AudioFormat f = t.getFormat();
-//			if(f.getChannels() > numChannels)
-//			{
-//				numChannels = f.getChannels();
-//			}
-//
-//			if(f.getFrameRate() > highestBitRate)
-//			{
-//				highestBitRate = f.getFrameRate();
-//			}
-//
-//			if(f.getSampleSizeInBits() > sampleSize)
-//			{
-//				sampleSize = f.getSampleSizeInBits();
-//			}
-//		}
-//
-//		return new AudioFormat(highestBitRate, sampleSize, numChannels, true, false);
-//	}
 
 	public AudioFormat getTrackListFormat()
 	{
