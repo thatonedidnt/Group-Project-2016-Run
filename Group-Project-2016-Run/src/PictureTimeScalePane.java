@@ -12,6 +12,7 @@ import javax.swing.Scrollable;
 
 public class PictureTimeScalePane extends JPanel implements ActionListener, Scrollable {
 	private static final long serialVersionUID = 9145548790046344469L;
+	private static final int SCALE_INTERVAL = 5;
 	
 	private TrackList tracklist;
 	private JPanel picpane;
@@ -34,9 +35,12 @@ public class PictureTimeScalePane extends JPanel implements ActionListener, Scro
 		
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, totalLength, 2);
-		for (int i = 5; i < totalLength/PicturePane.PIXELS_PER_SECOND; i += 5) {
+		for (int i = 5; i < totalLength/PicturePane.PIXELS_PER_SECOND; i += SCALE_INTERVAL) {
 			g.fillRect(i*PicturePane.PIXELS_PER_SECOND, 2, 2, 5);
-			g.drawString(Integer.toString(i), i*PicturePane.PIXELS_PER_SECOND+3, 12);
+			int minutes = i/60;
+			int seconds = i%60;
+			String timeString = Integer.toString(minutes)+":"+String.format("%02d", seconds);
+			g.drawString(timeString, i*PicturePane.PIXELS_PER_SECOND+3, 12);
 		}
 	}
 
@@ -50,7 +54,6 @@ public class PictureTimeScalePane extends JPanel implements ActionListener, Scro
 
 	@Override
 	public Dimension getPreferredScrollableViewportSize() {
-		//int totalLength = (int)(tracklist.totalLength()*PicturePane.PIXELS_PER_SECOND);
 		return new Dimension(picpane.getWidth(), 20);
 	}
 

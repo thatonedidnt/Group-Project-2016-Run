@@ -56,34 +56,23 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 
 		popup = new JPopupMenu();
 		JMenuItem edit = new JMenuItem("Edit...");
-		edit.setIcon(new ImageIcon(this.getClass().getResource("stock_edit_24.png")));
+		edit.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_edit_24.png")));
 		edit.addActionListener(this);
 		JMenuItem delete = new JMenuItem("Delete");
-		delete.setIcon(new ImageIcon(this.getClass().getResource("stock_trash_24.png")));
+		delete.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_trash_24.png")));
 		delete.addActionListener(this);
 		popup.add(edit);
 		popup.add(delete);
 		
 		scrollpane = new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		
+		scrollpane.getVerticalScrollBar().setUnitIncrement(8);
 		this.setLayout(new BorderLayout());
 		
 		add(scrollpane, BorderLayout.CENTER);
 	}
-	/*Creates a JTable reflecting the provided TrackList, adding this TrackTable to the TrackList’s ActionListeners. The format of the table is as in the storyboard, except with no Actions column.*/
 	
 	@Override
 	public void mouseClicked(MouseEvent ev) {
-		/*
-		Single click:
-		Highlights track and activates edit and delete buttons
-		Sets clicked track to selectedTrack
-		Double click
-		Constructs an EditTrackDialog([selected track]). If no track is selected, nothing happens. If more than one track is selected, nothing happens.
-		Right click
-		highlights clicked track
-		opens right click JPopupMenu with the following JMenuItems: “Edit”, “Delete”
-		*/
 		if (ev.getClickCount()==2 && !ev.isConsumed()) {
 			if (ev.getButton() == MouseEvent.BUTTON1) {
 				if (table.getSelectedRow() != -1) {
@@ -151,10 +140,6 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 	}
 	
 	public Track getSelected() {
-		/*
-		Track getSelected()
-		Returns the selected Track.
-		*/
 		int row = table.getSelectedRow();
 		if (row == -1) {
 			return null;
@@ -207,7 +192,7 @@ class TrackTableModel extends AbstractTableModel {
 	
 	@Override
 	public int getColumnCount() {
-		return 4;
+		return columnNames.length;
 	}
 
 	@Override

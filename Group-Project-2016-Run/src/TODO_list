@@ -8,14 +8,38 @@ Done, needs testing: Find out how to prevent loops in relative IDs
 Done, needs testing: Handle removal correctly
 Done, needs testing: Update all JFileChoosers to only select certain file types
 Done, needs testing: Make the PicturePane repaint itself when things change
-Apparently should be fixed when sound works: Make sensible defaults in Track
+Done, needs testing: Make sensible defaults in Track
 Done, needs testing: When EditTrackDialog opens, make the selected values mirror the already existing ones
 Done, needs testing: EditTrackDialog should not be able to make a Track relative to itself
 Done, needs testing: EditTrackDialog should disable the "End" radiobutton when "Start" is selected
 Done, needs testing: Make a separate name and filename for Tracks
 Done, needs testing: Make EditTrackDialog not close the whole program when only it is closed
-
 Done, needs testing: get sound to work ffs
 
+	Restrict size of FileNotFound
+	Restrict size of EditTrackDialog
+	Check if FileNotFound and other dialogs are being spawned at the right times
+	Reword FileNotFound's message
+	Make high-res version of TrackImage
+Done, needs testing: Change timeline to minutes and seconds. This is important! It is a specification.
+Looks like this is impossible: Fix glitchiness in TrackTablePane vertical scrolling
 
-Check spec compliance!
+Update the following in the Design:
+Done: BadFileException
+Done: BadPathException
+Done: DeleteTrackConfirmation
+Done: EditTrackDialog
+Done: FileNotFound
+Done: LaunchJRE
+Done: MainMenuBar
+Done: MainScreen
+Done: PicturePane
+	PictureTimeScalePane
+Done: RightHalfPane
+	Track
+	TrackList
+	TrackTable
+	TrackTablePane
+
+
+	Check spec compliance!

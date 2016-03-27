@@ -31,43 +31,43 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 
 		itemOpen=new JMenuItem("Open");
 		itemOpen.addActionListener(this);
-		itemOpen.setIcon(new ImageIcon(this.getClass().getResource("stock_open_24.png")));
+		itemOpen.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_open_24.png")));
 		menuFile.add(itemOpen);
 		
 		itemNew=new JMenuItem("New");
-		itemNew.setIcon(new ImageIcon(this.getClass().getResource("stock_new_24.png")));
+		itemNew.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_new_24.png")));
 		itemNew.addActionListener(this);
 		menuFile.add(itemNew);
 		
 		itemSaveAs=new JMenuItem("Save As");
-		itemSaveAs.setIcon(new ImageIcon(this.getClass().getResource("stock_save_24.png")));
+		itemSaveAs.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_save_24.png")));
 		itemSaveAs.addActionListener(this);
 		menuFile.add(itemSaveAs); 
 		
 		itemQuit=new JMenuItem("Quit");
-		itemQuit.setIcon(new ImageIcon(this.getClass().getResource("stock_exit_24.png")));
+		itemQuit.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_exit_24.png")));
 		itemQuit.addActionListener(this);
 		menuFile.add(itemQuit);
 
 		menuRecording=new JMenu("Recording");
 
 		itemNewTrack=new JMenuItem("New Track");
-		itemNewTrack.setIcon(new ImageIcon(this.getClass().getResource("stock_add_24.png")));
+		itemNewTrack.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_add_24.png")));
 		itemNewTrack.addActionListener(this);
 		menuRecording.add(itemNewTrack);
 		
 		itemCreateRecording=new JMenuItem("Create Recording");
-		itemCreateRecording.setIcon(new ImageIcon(this.getClass().getResource("stock_media_record_24.png")));
+		itemCreateRecording.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_media_record_24.png")));
 		itemCreateRecording.addActionListener(this);
 		menuRecording.add(itemCreateRecording);
 		
 		itemPreview=new JMenuItem("Preview");
-		itemPreview.setIcon(new ImageIcon(this.getClass().getResource("stock_media_play_24.png")));
+		itemPreview.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_media_play_24.png")));
 		itemPreview.addActionListener(this);
 		menuRecording.add(itemPreview);
 		
 		itemExport=new JMenuItem("Export");
-		itemExport.setIcon(new ImageIcon(this.getClass().getResource("stock_convert_24.png")));
+		itemExport.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_convert_24.png")));
 		itemExport.addActionListener(this);
 		menuRecording.add(itemExport);
 
@@ -109,10 +109,10 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 					this.enableButtons();
 				}
 				catch (BadFileException e1) {
-					JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.");
+					JOptionPane.showMessageDialog(null, "The script may be corrupt.", "Script File Error", JOptionPane.ERROR_MESSAGE);
 				}
 				catch (BadPathException e1) {
-					JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.");
+					JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.", "Script Path Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -136,10 +136,10 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 					this.enableButtons();
 				}
 				catch (BadFileException e1) {
-					JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.");
+					JOptionPane.showMessageDialog(null, "The script may be corrupt.", "Script File Error", JOptionPane.ERROR_MESSAGE);
 				}
 				catch (BadPathException e1) {
-					JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.");
+					JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.", "Script Path Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -147,7 +147,6 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 			JFileChooser fc = new JFileChooser(lastPathSaveAs);
 			FileNameExtensionFilter dbtsfilter = new FileNameExtensionFilter("Script files (*.dbts)", "dbts");
 			fc.setFileFilter(dbtsfilter);
-			System.out.println(lastPathSaveAs);
 			int returnVal = fc.showDialog(itemOpen, "Save As...");
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				File file = fc.getSelectedFile();
@@ -159,7 +158,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 					tracklist.save(file.getAbsolutePath());
 				}
 				catch (BadPathException e1) {
-					JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.");
+					JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.", "Script Path Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -215,7 +214,7 @@ public class MainMenuBar extends JMenuBar implements ActionListener{
 				}
 				catch(BadPathException ex)
 				{
-					JOptionPane.showMessageDialog(null, "The path for exporting the script isn't accessible.");
+					JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.", "Script Path Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}

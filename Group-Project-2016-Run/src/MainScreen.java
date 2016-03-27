@@ -1,3 +1,4 @@
+
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,7 +23,7 @@ public class MainScreen extends JFrame implements ActionListener {
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setPreferredSize(new Dimension(800,600));
 		mainFrame.setMinimumSize(new Dimension(600,400));
-		mainFrame.setIconImage(new ImageIcon(this.getClass().getResource("logo.png")).getImage());
+		mainFrame.setIconImage(new ImageIcon(this.getClass().getResource("assets/logo.png")).getImage());
 		
 		try { 
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 
@@ -42,14 +43,13 @@ public class MainScreen extends JFrame implements ActionListener {
 		
 		JScrollBar TrackTableVertBar = trackTablePane.getTrackTableScrollPane().getVerticalScrollBar();
 		JScrollBar PicturePaneVertBar = righthalfpane.getVertScrollPane().getVerticalScrollBar();
-		TrackTableVertBar.setModel(PicturePaneVertBar.getModel());
-		//timescalescroller.getVerticalScrollBar().setModel(((MainScreen)this.getParent()).getTrackTableScrollPane().getVerticalScrollBar().getModel());
+		PicturePaneVertBar.setModel(TrackTableVertBar.getModel());
 		
 		list.setParentFrame(this);
 		
 		mainFrame.pack();
-		mainFrame.setVisible(true);
 		mainFrame.setExtendedState(mainFrame.getExtendedState()|JFrame.MAXIMIZED_BOTH);
+		mainFrame.setVisible(true);
 	}
 	
 	
@@ -63,9 +63,5 @@ public class MainScreen extends JFrame implements ActionListener {
 		if (ev.getActionCommand().equals("updateScript")) {
 			mainFrame.setTitle(list.getFileName()+" - Dubbing Tool");
 		}
-	}
-	
-	public JScrollPane getTrackTableScrollPane() {
-		return trackTablePane.getTrackTableScrollPane();
 	}
 }

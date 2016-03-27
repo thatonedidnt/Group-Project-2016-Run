@@ -172,7 +172,6 @@ public class TrackList implements Runnable
 
 	public void add(Track newTrack) {
 		tracks.add(newTrack);
-//		this.format = getHighestQualityFormat();
 		updateActionListeners();
 	}
 
@@ -203,6 +202,7 @@ public class TrackList implements Runnable
 				if (t == this.get(index)) continue;
 				if ((this.get(index).startTime()-(t.startTime()+t.getLength()) >= 0) && (this.get(index).startTime()-(t.startTime()+t.getLength()) < closest)) {
 					newRelID = t.getID();
+					closest = this.get(index).startTime()-(t.startTime()+t.getLength());
 				}
 			}
 		}
@@ -266,6 +266,8 @@ public class TrackList implements Runnable
 			return;
 		}
 		
+		final Thread t = new Thread(this);
+		
 		SwingUtilities.invokeLater(new Runnable()
 		{
 			@Override
@@ -273,7 +275,7 @@ public class TrackList implements Runnable
 			{
 				JOptionPane pane = new JOptionPane("Playing Script...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				dialog = new StopDialog((JFrame)parentFrame, "Preview", false, TrackList.this);
-				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setAlwaysOnTop(true);
 				dialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
@@ -284,6 +286,7 @@ public class TrackList implements Runnable
 						if(arg0.getPropertyName().equals("value"))
 						{
 							terminateSound = true;
+							t.interrupt();
 						}
 					}
 				});
@@ -291,10 +294,12 @@ public class TrackList implements Runnable
 				dialog.addWindowListener(new WindowAdapter() {
 					public void windowClosed(WindowEvent ev) {
 						terminateSound = true;
+						t.interrupt();
 					}
 					
 					public void windowClosing(WindowEvent ev) {
 						terminateSound = true;
+						t.interrupt();
 					}
 				});
 				dialog.pack();
@@ -302,7 +307,6 @@ public class TrackList implements Runnable
 
 			}
 		});
-		Thread t = new Thread(this);
 		t.start();
 	}
 	
@@ -311,22 +315,31 @@ public class TrackList implements Runnable
 		terminateSound = false;
 
 		long beginTime = System.currentTimeMillis();
-		//ArrayList<Integer> playedIDs = new ArrayList<Integer>();
 		boolean[] playedAlready = new boolean[this.numTracks()];
 		
 		while(currentTime < totalLength() && !terminateSound)
 		{
-			//currentTime += ((double)(System.currentTimeMillis() - lastTime)) / (1000.0);
-			//lastTime = System.currentTimeMillis();
 			currentTime = (System.currentTimeMillis() - beginTime)/1000.0;
-			
+			double starterInterval = totalLength();
 			for (int i = 0; i < this.numTracks(); ++i) {
 				if (!playedAlready[i] && (this.get(i).startTime() < currentTime)) {
 					playedAlready[i] = true;
 					Thread t = new Thread(this.get(i));
 					t.start();
 				}
+				if (!playedAlready[i] && (this.get(i).startTime()-currentTime < starterInterval)) {
+					if (this.get(i).startTime()-currentTime < 0) {
+						starterInterval = 0;
+					}
+					else {
+						starterInterval = this.get(i).startTime()-currentTime;
+					}
+				}
 			}
+			try {
+				Thread.sleep((int)(starterInterval*1000));
+			}
+			catch (InterruptedException ex) {}
 		}
 		for(Track track : tracks)
 		{
@@ -372,7 +385,7 @@ public class TrackList implements Runnable
 				this.save(this.getFileName());
 			}
 		} catch (BadPathException ex) {
-			JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.");
+			JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.", "Script Path Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -534,33 +547,6 @@ public class TrackList implements Runnable
 	public String getFileName() {
 		return fileName;
 	}
-
-//	private AudioFormat getHighestQualityFormat()
-//	{
-//		int numChannels = 1;
-//		float highestBitRate = 11025;
-//		int sampleSize = 8;
-//		for(Track t : tracks)
-//		{
-//			AudioFormat f = t.getFormat();
-//			if(f.getChannels() > numChannels)
-//			{
-//				numChannels = f.getChannels();
-//			}
-//
-//			if(f.getFrameRate() > highestBitRate)
-//			{
-//				highestBitRate = f.getFrameRate();
-//			}
-//
-//			if(f.getSampleSizeInBits() > sampleSize)
-//			{
-//				sampleSize = f.getSampleSizeInBits();
-//			}
-//		}
-//
-//		return new AudioFormat(highestBitRate, sampleSize, numChannels, true, false);
-//	}
 
 	public AudioFormat getTrackListFormat()
 	{

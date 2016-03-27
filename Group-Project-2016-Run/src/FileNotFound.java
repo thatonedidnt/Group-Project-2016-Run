@@ -5,10 +5,6 @@ import javax.swing.JOptionPane;
 public class FileNotFound {
 
 	FileNotFound(ArrayList<String> files) {
-
-		for (int i = 0; i == files.size(); i++) {
-			System.out.println("Error. Files not found: " + files.get(i));
-		}
 		String fileNotFoundList = "";
 		int maxFiles = files.size();
 		int overflowFiles = 0;

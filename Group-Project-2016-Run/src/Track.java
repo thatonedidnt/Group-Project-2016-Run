@@ -150,7 +150,6 @@ public class Track implements Runnable
 		soundClip.stop();
 		while(soundClip.getFramePosition() != 0) soundClip.setFramePosition(0);
 		soundClip.start();
-		//new Thread(this);
 	}
 	
 	public void play()
@@ -171,6 +170,7 @@ public class Track implements Runnable
 				JOptionPane pane = new JOptionPane("Previewing Track...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				dialog = new JDialog((JFrame)null, "Preview", false);
 				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				dialog.setAlwaysOnTop(true);
 				dialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
@@ -212,7 +212,10 @@ public class Track implements Runnable
 
 
 		while(soundClip.getFramePosition() == 0);
-		while(soundClip.isRunning() && !terminateSound);
+		try {
+			while(soundClip.isRunning() && !terminateSound) Thread.sleep(20);
+		}
+		catch (InterruptedException ex) {}
 
 		stop();
 		if(dialog != null && dialog.isActive())
@@ -277,7 +280,7 @@ public class Track implements Runnable
 				}
 				FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
 				float range = volumeMod.getMinimum();
-				range *= ((100.0 - this.intensity) / 100.0);
+				range *= Math.pow(((100.0 - this.intensity) / 100.0), 2.2); //adjust curve of how much intensity affects volume
 				volumeMod.setValue(range);
 				tracklist.updateActionListeners();
 				dataStream.setAmplitudeLog(range);
@@ -375,8 +378,6 @@ public class Track implements Runnable
 
 	private void loadClip()
 	{
-		//if(soundClip.isOpen())
-		//	soundClip.close();
 		try 
 		{
 			if (dataStream != null) {
@@ -439,7 +440,7 @@ public class Track implements Runnable
 		return (long)ret;
 	}
 	
-	public void record() throws LineUnavailableException, Exception
+	private void record() throws LineUnavailableException, Exception
 	{
 		Thread t = new Thread(recorder);
 		t.start();

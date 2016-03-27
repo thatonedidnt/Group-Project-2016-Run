@@ -65,7 +65,7 @@ public class RightHalfPane extends JPanel implements ActionListener {
 		JScrollBar TimeScaleScrollBar = horizScroll.getHorizontalScrollBar();
 		TimeScaleScrollBar.setModel(PicturePaneScrollBar.getModel());
 		
-		JLabel units = new JLabel("Seconds");
+		JLabel units = new JLabel("Time (MM:SS)");
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.LINE_START;
 		gbc.gridx = 0;
@@ -76,7 +76,7 @@ public class RightHalfPane extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent ev) {
 		if (ev.getActionCommand().equals("updateScript")) {
-			//this.revalidate();
+			//note: this implies RightHalfPane must always have a parent
 			this.getParent().getParent().revalidate();
 		}
 	}
