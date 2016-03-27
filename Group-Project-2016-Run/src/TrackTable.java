@@ -56,10 +56,10 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 
 		popup = new JPopupMenu();
 		JMenuItem edit = new JMenuItem("Edit...");
-		edit.setIcon(new ImageIcon(this.getClass().getResource("stock_edit_24.png")));
+		edit.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_edit_24.png")));
 		edit.addActionListener(this);
 		JMenuItem delete = new JMenuItem("Delete");
-		delete.setIcon(new ImageIcon(this.getClass().getResource("stock_trash_24.png")));
+		delete.setIcon(new ImageIcon(this.getClass().getResource("assets/stock_trash_24.png")));
 		delete.addActionListener(this);
 		popup.add(edit);
 		popup.add(delete);

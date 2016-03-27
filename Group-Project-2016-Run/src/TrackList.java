@@ -195,6 +195,7 @@ public class TrackList implements Runnable
 				if (t == this.get(index)) continue;
 				if ((this.get(index).startTime()-(t.startTime()+t.getLength()) >= 0) && (this.get(index).startTime()-(t.startTime()+t.getLength()) < closest)) {
 					newRelID = t.getID();
+					closest = this.get(index).startTime()-(t.startTime()+t.getLength());
 				}
 			}
 		}
@@ -367,7 +368,7 @@ public class TrackList implements Runnable
 				this.save(this.getFileName());
 			}
 		} catch (BadPathException ex) {
-			JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.");
+			JOptionPane.showMessageDialog(null, "The path for saving the script isn't accessible.", "Script Path Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

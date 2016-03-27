@@ -19,7 +19,7 @@ public class MainScreen extends JFrame implements ActionListener {
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setPreferredSize(new Dimension(800,600));
 		mainFrame.setMinimumSize(new Dimension(600,400));
-		mainFrame.setIconImage(new ImageIcon(this.getClass().getResource("logo.png")).getImage());
+		mainFrame.setIconImage(new ImageIcon(this.getClass().getResource("assets/logo.png")).getImage());
 		
 		try { 
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 

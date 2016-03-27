@@ -72,7 +72,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		pane.add(relativeTrack, c);
 		
 		comboItems = new ArrayList<TrackForwarder>();
-		comboItems.add(new TrackForwarder(list.getByID(0), "Start"));
+		comboItems.add(new TrackForwarder(list.getByID(0), "Start of Script"));
 		for (Track t : list.getTracks()) {
 			if ((t == currentTrack) || currentTrack.willBeCyclic(t.getID())) continue;
 			comboItems.add(new TrackForwarder(t, t.getShortFileName()));
