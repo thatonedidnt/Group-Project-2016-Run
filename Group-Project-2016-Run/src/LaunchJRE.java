@@ -2,7 +2,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
 
 import org.jgrapht.DirectedGraph;
 import org.tritonus.dsp.ais.AmplitudeAudioInputStream;
@@ -38,7 +41,7 @@ public class LaunchJRE {
 
 	private static int launch(ArrayList<String> cmdarray) throws IOException,
 	InterruptedException {
-		byte[] buffer = new byte[1024];
+		byte[] buffer = new byte[65536];
 
 		ProcessBuilder processBuilder = new ProcessBuilder(cmdarray);
 		processBuilder.redirectErrorStream(true);
@@ -55,19 +58,20 @@ public class LaunchJRE {
 	}
 
 	private static String getLibPath(Class<?> c) {
-		return new java.io.File(c.getProtectionDomain()
-				  .getCodeSource()
-				  .getLocation()
-				  .getPath()).getAbsolutePath();
+		try {
+			return new java.io.File(c.getProtectionDomain()
+					  .getCodeSource()
+					  .getLocation()
+					  .toURI()).getAbsolutePath();
+		} catch (URISyntaxException e) {
+			JOptionPane.showMessageDialog(null, "An internal program file couldn't be located.", "Load error", JOptionPane.ERROR_MESSAGE);
+		}
+		return null;
 	}
 	
 	public static void main(String[] args) {
 		try {
-			String jarPath = new java.io.File(MainScreen.class.getProtectionDomain()
-					  .getCodeSource()
-					  .getLocation()
-					  .getPath())
-					.getAbsolutePath();
+			String jarPath = getLibPath(MainScreen.class);
 			ArrayList<String> cmdarray = new ArrayList<String>();
 			cmdarray.add(getJreExecutable().toString());
 			if (LaunchJRE.class.getResource("LaunchJRE.class").toString().substring(0,3).equals("jar")) {
@@ -75,16 +79,13 @@ public class LaunchJRE {
 				cmdarray.add(jarPath);
 			}
 			else {
-				String libPath = new java.io.File(AmplitudeAudioInputStream.class.getProtectionDomain()
-						  .getCodeSource()
-						  .getLocation()
-						  .getPath()).getAbsolutePath();
+				String libPath = getLibPath(AmplitudeAudioInputStream.class);
 				libPath += ";"+getLibPath(TSynchronousFilteredAudioInputStream.class);
 				libPath += ";"+getLibPath(DirectedGraph.class);
 				cmdarray.add("-cp");
 				cmdarray.add(jarPath+";"+libPath);
 			}
-			cmdarray.add("-Xmx8g");
+			cmdarray.add("-Xmx1g");
 			cmdarray.add("MainScreen");
 			launch(cmdarray);
 		} catch (IOException e) {
