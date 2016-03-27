@@ -313,7 +313,8 @@ public class TrackList implements Runnable
 		while(currentTime < totalLength() && !terminateSound)
 		{
 			currentTime = (System.currentTimeMillis() - beginTime)/1000.0;
-			double starterInterval = totalLength();
+			double starterInterval = totalLength()-currentTime;
+			if (starterInterval < 0) starterInterval = 0;
 			for (int i = 0; i < this.numTracks(); ++i) {
 				if (!playedAlready[i] && (this.get(i).startTime() < currentTime)) {
 					playedAlready[i] = true;
