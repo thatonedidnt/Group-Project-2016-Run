@@ -31,9 +31,6 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		currentTrack = track;
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
 		this.setResizable(false);
-		try { 
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 
-		} catch (Exception ex) { }
 		this.setTitle("Editing track "+track.getShortFileName());
 		this.setIconImage(new ImageIcon(this.getClass().getResource("logo.png")).getImage());
 		
