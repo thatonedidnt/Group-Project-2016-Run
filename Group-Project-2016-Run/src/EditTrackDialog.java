@@ -32,7 +32,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);	
 		this.setResizable(false);
 		this.setTitle("Editing track "+track.getShortFileName());
-		this.setIconImage(new ImageIcon(this.getClass().getResource("logo.png")).getImage());
+		this.setIconImage(new ImageIcon(this.getClass().getResource("assets/logo.png")).getImage());
 		
 		JPanel pane = new JPanel(new GridBagLayout());	
 		Border margin = new EmptyBorder(10,10,10,10);
@@ -155,7 +155,6 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 		this.add(pane);
 		this.pack();
 		SwingUtilities.getRootPane(save).setDefaultButton(save);
-		this.setVisible(true);
 		
 		backUpTrack = new Track(
 				currentTrack.getFileName(),
@@ -166,6 +165,7 @@ public class EditTrackDialog extends JFrame implements ActionListener {
 				list
 				);
 		this.setLocationRelativeTo(null);
+		this.setVisible(true);
 	}
 	
 	private int mapIDToComboList(int id) {
