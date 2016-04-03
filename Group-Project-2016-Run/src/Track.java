@@ -517,7 +517,14 @@ class AudioRecorder implements Runnable
 	@Override
 	public void run()
 	{
-		File temp = new File("temp.wav");
+		File temp = new File(System.getProperty("java.io.tmpdir")+"temp.wav");
+		try {
+			temp = File.createTempFile("recording-temp", ".wav");
+		} catch (IOException ex) {
+			JOptionPane.showMessageDialog(null, "The path for saving the temporary recording isn't accessible.", "Temporary Recording Path Error", JOptionPane.ERROR_MESSAGE);
+			track.makeMeBad();
+			return;
+		}
 		DataLine.Info info = new DataLine.Info(TargetDataLine.class, Track.RECORD_FMT);
 		if(!AudioSystem.isLineSupported(info))
 		{
@@ -542,6 +549,7 @@ class AudioRecorder implements Runnable
 		}
 		catch(IOException e)
 		{
+			JOptionPane.showMessageDialog(null, "The path for saving the temporary recording isn't accessible.", "Temporary Recording Path Error", JOptionPane.ERROR_MESSAGE);
 			track.makeMeBad();
 			return;
 		}
