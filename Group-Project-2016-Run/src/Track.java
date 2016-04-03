@@ -184,10 +184,12 @@ public class Track implements Runnable
 				});
 				playDialog.add(pane);
 				playDialog.addWindowListener(new WindowAdapter() {
+					@Override
 					public void windowClosed(WindowEvent ev) {
 						terminateSound = true;
 					}
 					
+					@Override
 					public void windowClosing(WindowEvent ev) {
 						terminateSound = true;
 					}
@@ -202,6 +204,7 @@ public class Track implements Runnable
 	}
 	
 	//	FOR PLAY METHOD
+	@Override
 	public void run()
 	{
 
@@ -459,10 +462,12 @@ public class Track implements Runnable
 				});
 				recordDialog.add(pane);
 				recordDialog.addWindowListener(new WindowAdapter() {
+					@Override
 					public void windowClosed(WindowEvent ev) {
 						recorder.stopRecord();
 					}
 					
+					@Override
 					public void windowClosing(WindowEvent ev) {
 						recorder.stopRecord();
 					}
@@ -553,7 +558,7 @@ class AudioRecorder implements Runnable
 			track.makeMeBad();
 			return;
 		}
-		File save = tracklist.saveDialog("wav", "WAVE File");
+		File save = tracklist.saveDialog("wav", "WAVE File (*.wav)");
 		if(save == null)
 		{
 			temp.delete();

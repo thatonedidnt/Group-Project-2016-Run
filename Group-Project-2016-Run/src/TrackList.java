@@ -59,6 +59,7 @@ class ClippingInputStream extends AudioInputStream
 		return sampleLength;
 	}
 	
+	@Override
 	public int read(byte[] buffer, int off, int len) throws IOException
 	{
 		int[] byteSums = new int[len];
@@ -285,11 +286,13 @@ public class TrackList implements Runnable
 				});
 				dialog.add(pane);
 				dialog.addWindowListener(new WindowAdapter() {
+					@Override
 					public void windowClosed(WindowEvent ev) {
 						terminateSound = true;
 						t.interrupt();
 					}
 					
+					@Override
 					public void windowClosing(WindowEvent ev) {
 						terminateSound = true;
 						t.interrupt();
@@ -303,6 +306,7 @@ public class TrackList implements Runnable
 		t.start();
 	}
 	
+	@Override
 	public void run() {
 		double currentTime = 0;
 		terminateSound = false;
