@@ -519,7 +519,7 @@ class AudioRecorder implements Runnable
 	{
 		File temp = new File(System.getProperty("java.io.tmpdir")+"temp.wav");
 		try {
-			temp = File.createTempFile("recording-temp", ".wav");
+			temp = File.createTempFile(System.getProperty("java.io.tmpdir")+"recording-temp", ".wav");
 		} catch (IOException ex) {
 			JOptionPane.showMessageDialog(null, "The path for saving the temporary recording isn't accessible.", "Temporary Recording Path Error", JOptionPane.ERROR_MESSAGE);
 			track.makeMeBad();
