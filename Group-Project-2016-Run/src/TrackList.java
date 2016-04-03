@@ -64,6 +64,7 @@ class ClippingInputStream extends AudioInputStream
 		return sampleLength;
 	}
 	
+	@Override
 	public int read(byte[] buffer, int off, int len) throws IOException
 	{
 		int[] byteSums = new int[len];
@@ -292,11 +293,13 @@ public class TrackList implements Runnable
 				});
 				dialog.add(pane);
 				dialog.addWindowListener(new WindowAdapter() {
+					@Override
 					public void windowClosed(WindowEvent ev) {
 						terminateSound = true;
 						t.interrupt();
 					}
 					
+					@Override
 					public void windowClosing(WindowEvent ev) {
 						terminateSound = true;
 						t.interrupt();
@@ -310,6 +313,7 @@ public class TrackList implements Runnable
 		t.start();
 	}
 	
+	@Override
 	public void run() {
 		double currentTime = 0;
 		terminateSound = false;
@@ -320,7 +324,8 @@ public class TrackList implements Runnable
 		while(currentTime < totalLength() && !terminateSound)
 		{
 			currentTime = (System.currentTimeMillis() - beginTime)/1000.0;
-			double starterInterval = totalLength();
+			double starterInterval = totalLength()-currentTime;
+			if (starterInterval < 0) starterInterval = 0;
 			for (int i = 0; i < this.numTracks(); ++i) {
 				if (!playedAlready[i] && (this.get(i).startTime() < currentTime)) {
 					playedAlready[i] = true;

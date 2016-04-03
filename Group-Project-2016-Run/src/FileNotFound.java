@@ -23,7 +23,7 @@ public class FileNotFound {
 			fileNotFoundList += "\nand "+overflowFiles+" more.";
 		}
 		JOptionPane.showMessageDialog(null,
-			"Files not found:\n" + fileNotFoundList, "Audio files not found",
+			"Files not found, or are corrupt:\n" + fileNotFoundList, "Audio files not found, or are corrupt",
 			JOptionPane.ERROR_MESSAGE);
 	}
 }

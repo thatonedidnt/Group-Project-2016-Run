@@ -53,7 +53,7 @@ public class MainScreen extends JFrame implements ActionListener {
 	}
 	
 	
-	public static void main(String[] a){
+	public static void main(String[] args){
 		TrackList list = new TrackList();
 		new MainScreen(list);
 	}

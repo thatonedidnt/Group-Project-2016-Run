@@ -18,8 +18,8 @@ Done, needs testing: get sound to work ffs
 
 	Restrict size of FileNotFound
 	Restrict size of EditTrackDialog
-	Check if FileNotFound and other dialogs are being spawned at the right times
-	Reword FileNotFound's message
+Check if FileNotFound and other dialogs are being spawned at the right times
+Done, needs testing: Reword FileNotFound's message
 	Make high-res version of TrackImage
 Done, needs testing: Change timeline to minutes and seconds. This is important! It is a specification.
 Looks like this is impossible: Fix glitchiness in TrackTablePane vertical scrolling
@@ -34,12 +34,12 @@ Done: LaunchJRE
 Done: MainMenuBar
 Done: MainScreen
 Done: PicturePane
-	PictureTimeScalePane
+Done: PictureTimeScalePane
 Done: RightHalfPane
 	Track
 	TrackList
 	TrackTable
-	TrackTablePane
+Done: TrackTablePane
 
 
 	Check spec compliance!

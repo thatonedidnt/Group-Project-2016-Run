@@ -18,7 +18,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.UIManager;
 
 
 public class TrackTable extends JPanel implements ActionListener, MouseListener {
@@ -38,13 +37,6 @@ public class TrackTable extends JPanel implements ActionListener, MouseListener 
 		
 		this.list = list;
 		list.addActionListener(this);
-		
-		try { 
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); 
-		} catch (Exception ex) { 
-			ex.printStackTrace(); 
-		}
-		
 		model = new TrackTableModel(this.list);
 		
 		table = new JTable(model);
