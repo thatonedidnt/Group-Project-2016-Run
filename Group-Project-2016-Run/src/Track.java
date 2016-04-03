@@ -46,13 +46,11 @@ public class Track implements Runnable
 	
 	private boolean isGood;
 	private volatile boolean terminateSound;
-	private JDialog dialog;
+	private JDialog playDialog;
 	private JDialog recordDialog;
 
-	public static final int RECORD = 1;
 	public static final boolean START = true;
 	public static final boolean END = false;
-	public static final int TRACK_BEGINNING = 0;
 	private final AudioRecorder recorder;
 	
 	public Track(String fileName, TrackList tracklist)
@@ -168,10 +166,10 @@ public class Track implements Runnable
 			public void run()
 			{
 				JOptionPane pane = new JOptionPane("Previewing Track...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
-				dialog = new JDialog((JFrame)null, "Preview", false);
-				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-				dialog.setAlwaysOnTop(true);
-				dialog.setResizable(false);
+				playDialog = new JDialog((JFrame)null, "Preview", false);
+				playDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+				playDialog.setAlwaysOnTop(true);
+				playDialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
 
@@ -184,8 +182,8 @@ public class Track implements Runnable
 						}
 					}
 				});
-				dialog.add(pane);
-				dialog.addWindowListener(new WindowAdapter() {
+				playDialog.add(pane);
+				playDialog.addWindowListener(new WindowAdapter() {
 					public void windowClosed(WindowEvent ev) {
 						terminateSound = true;
 					}
@@ -194,8 +192,8 @@ public class Track implements Runnable
 						terminateSound = true;
 					}
 				});
-				dialog.pack();
-				dialog.setVisible(true);
+				playDialog.pack();
+				playDialog.setVisible(true);
 
 			}
 		});
@@ -218,8 +216,8 @@ public class Track implements Runnable
 		catch (InterruptedException ex) {}
 
 		stop();
-		if(dialog != null && dialog.isActive())
-			dialog.dispose();
+		if(playDialog != null && playDialog.isActive())
+			playDialog.dispose();
 	}
 	
 	public void stop()
@@ -229,13 +227,6 @@ public class Track implements Runnable
 			if(soundClip.isRunning())
 				soundClip.stop();
 		}
-	}
-	
-	public Clip getSound()
-	{
-		if(!soundClip.isOpen())
-			loadClip();
-		return soundClip;
 	}
 
 	public void setFileName(String fileName)
