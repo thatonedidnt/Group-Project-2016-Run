@@ -234,15 +234,17 @@ public class Track implements Runnable
 			while((bytesRead = soundStreamBuffer.read(b)) != -1 && !terminateSound)
 			{
 				soundStream.write(b, 0, bytesRead);
+				Thread.sleep(1);
 			}
 		}
 		catch (IOException e) {}
+		catch (InterruptedException ex) {}
 		if(!terminateSound)
 			soundStream.drain();
 		else
 			soundStream.flush();
 		stop();
-		if(playDialog != null && playDialog.isActive())
+		if(playDialog != null && playDialog.isVisible())
 			playDialog.dispose();
 	}
 	

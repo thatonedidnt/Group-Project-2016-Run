@@ -352,7 +352,7 @@ public class TrackList implements Runnable
 				e.printStackTrace();
 			}
 		}
-		if (dialog.isActive()) {
+		if (dialog.isVisible()) {
 			dialog.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "stopPlay"));
 		}
 		terminateSound = true;
