@@ -187,7 +187,7 @@ public class Track implements Runnable
 				JOptionPane pane = new JOptionPane("Previewing Track...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				playDialog = new JDialog((JFrame)null, "Preview", false);
 				playDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-				playDialog.setAlwaysOnTop(true);
+				playDialog.setModal(true);
 				playDialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
