@@ -137,7 +137,8 @@ public class TrackList implements Runnable
 			}
 		}
 	}
-	
+
+	private static final AudioFormat format = new AudioFormat(44100, 16, 2, true, false);
 	private static final Track START = new Track("",
 			100,
 			-1,
@@ -153,15 +154,12 @@ public class TrackList implements Runnable
 	private String fileName;
 	private JFrame parentFrame = null;
 
-	private AudioFormat format;
 
 	private volatile boolean terminateSound;
 
 	public TrackList() {
-		format = null;
 		tracks = new ArrayList<Track>();
 		actionlisteners = new ArrayList<ActionListener>();
-		format = new AudioFormat(44100, 16, 2, true, false);
 	}
 
 	public void add(Track newTrack) {
@@ -536,7 +534,7 @@ public class TrackList implements Runnable
 		return fileName;
 	}
 
-	public AudioFormat getTrackListFormat()
+	public static AudioFormat getTrackListFormat()
 	{
 		return format;
 	}
