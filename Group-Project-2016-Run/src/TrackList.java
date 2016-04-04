@@ -269,7 +269,7 @@ public class TrackList implements Runnable
 			{
 				JOptionPane pane = new JOptionPane("Playing Script...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				dialog = new StopDialog((JFrame)parentFrame, "Preview", false, TrackList.this);
-				dialog.setAlwaysOnTop(true);
+				dialog.setModal(true);
 				dialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
@@ -354,7 +354,9 @@ public class TrackList implements Runnable
 				e.printStackTrace();
 			}
 		}
-		dialog.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "stopPlay"));
+		if (dialog.isActive()) {
+			dialog.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "stopPlay"));
+		}
 		terminateSound = true;
 	}
 
