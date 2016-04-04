@@ -214,6 +214,7 @@ public class Track implements Runnable
 					}
 				});
 				playDialog.pack();
+				playDialog.setLocationRelativeTo(null);
 				playDialog.setVisible(true);
 
 			}

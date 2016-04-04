@@ -49,6 +49,7 @@ public class PictureTimeScalePane extends JPanel implements ActionListener, Scro
 		if (ev.getActionCommand().equals("updateScript")) {
 			this.revalidate();
 			this.getParent().getParent().repaint();
+			this.repaint();
 		}
 	}
 

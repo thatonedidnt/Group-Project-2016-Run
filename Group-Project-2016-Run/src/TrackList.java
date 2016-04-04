@@ -297,8 +297,8 @@ public class TrackList implements Runnable
 					}
 				});
 				dialog.pack();
+				dialog.setLocationRelativeTo(null);
 				dialog.setVisible(true);
-
 			}
 		});
 		t.start();
