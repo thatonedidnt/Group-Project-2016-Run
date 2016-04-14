@@ -142,7 +142,8 @@ public class TrackList implements Runnable
 			}
 		}
 	}
-	
+
+	private static final AudioFormat format = new AudioFormat(44100, 16, 2, true, false);
 	private static final Track START = new Track("",
 			100,
 			-1,
@@ -159,15 +160,12 @@ public class TrackList implements Runnable
 	private JFrame parentFrame = null;
 	private ListenableDirectedGraph<Track, DefaultEdge> graph;
 
-	private AudioFormat format;
 
 	private volatile boolean terminateSound;
 
 	public TrackList() {
-		format = null;
 		tracks = new ArrayList<Track>();
 		actionlisteners = new ArrayList<ActionListener>();
-		format = new AudioFormat(44100, 16, 2, true, false);
 		graph = new ListenableDirectedGraph<Track, DefaultEdge>(DefaultEdge.class);
 	}
 
@@ -276,7 +274,7 @@ public class TrackList implements Runnable
 			{
 				JOptionPane pane = new JOptionPane("Playing Script...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				dialog = new StopDialog((JFrame)parentFrame, "Preview", false, TrackList.this);
-				dialog.setAlwaysOnTop(true);
+				dialog.setModal(true);
 				dialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
@@ -306,8 +304,8 @@ public class TrackList implements Runnable
 					}
 				});
 				dialog.pack();
+				dialog.setLocationRelativeTo(null);
 				dialog.setVisible(true);
-
 			}
 		});
 		t.start();
@@ -361,7 +359,9 @@ public class TrackList implements Runnable
 				e.printStackTrace();
 			}
 		}
-		dialog.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "stopPlay"));
+		if (dialog.isVisible()) {
+			dialog.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "stopPlay"));
+		}
 		terminateSound = true;
 	}
 
@@ -553,7 +553,7 @@ public class TrackList implements Runnable
 		return fileName;
 	}
 
-	public AudioFormat getTrackListFormat()
+	public static AudioFormat getTrackListFormat()
 	{
 		return format;
 	}

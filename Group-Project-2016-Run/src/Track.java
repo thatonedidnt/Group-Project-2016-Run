@@ -11,10 +11,10 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.TargetDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JDialog;
@@ -42,7 +42,8 @@ public class Track implements Runnable
 	private int ID;
 	private AmplitudeAudioInputStream dataStream;
 	private TrackList tracklist;
-	private Clip soundClip;
+	private SourceDataLine soundStream;
+	private AudioInputStream soundStreamBuffer;
 	
 	private boolean isGood;
 	private volatile boolean terminateSound;
@@ -66,9 +67,10 @@ public class Track implements Runnable
 		try 
 		{
 			loadStream();
-			soundClip = AudioSystem.getClip();
+			DataLine.Info info = new DataLine.Info(SourceDataLine.class, TrackList.getTrackListFormat());
+			soundStream = (SourceDataLine)AudioSystem.getLine(info);
+			soundStream.open(TrackList.getTrackListFormat());
 			loadClip();
-			loadStream();
 		} 
 		catch (Exception e)
 		{
@@ -91,7 +93,10 @@ public class Track implements Runnable
 		isGood = true;
 		try 
 		{
-			soundClip = AudioSystem.getClip();
+			DataLine.Info info = new DataLine.Info(SourceDataLine.class, TrackList.getTrackListFormat());
+			soundStream = (SourceDataLine)AudioSystem.getLine(info);
+			soundStream.open(TrackList.getTrackListFormat());
+			loadClip();
 		} 
 		catch(LineUnavailableException e) 
 		{
@@ -141,13 +146,27 @@ public class Track implements Runnable
 	
 	public void playNoBlock()
 	{
-		if(!soundClip.isOpen())
+		Thread t = new Thread(new Runnable()
 		{
-			loadClip();
-		}
-		soundClip.stop();
-		while(soundClip.getFramePosition() != 0) soundClip.setFramePosition(0);
-		soundClip.start();
+			@Override
+			public void run()
+			{
+				soundStream.start();
+				int bytesRead = -1;
+				byte b[] = new byte[4096];
+				try {
+					while((bytesRead = soundStreamBuffer.read(b)) != -1)
+					{
+						soundStream.write(b, 0, bytesRead);
+					}
+				}
+				catch (IOException e) {}
+				soundStream.flush();
+				stop();
+			}
+			
+		});
+		t.start();
 	}
 	
 	public void play()
@@ -168,7 +187,7 @@ public class Track implements Runnable
 				JOptionPane pane = new JOptionPane("Previewing Track...", JOptionPane.INFORMATION_MESSAGE, JOptionPane.CANCEL_OPTION, null, new String[]{"Cancel"});
 				playDialog = new JDialog((JFrame)null, "Preview", false);
 				playDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-				playDialog.setAlwaysOnTop(true);
+				playDialog.setModal(true);
 				playDialog.setResizable(false);
 				pane.addPropertyChangeListener(new PropertyChangeListener()
 				{
@@ -195,6 +214,7 @@ public class Track implements Runnable
 					}
 				});
 				playDialog.pack();
+				playDialog.setLocationRelativeTo(null);
 				playDialog.setVisible(true);
 
 			}
@@ -207,28 +227,34 @@ public class Track implements Runnable
 	@Override
 	public void run()
 	{
-
-		playNoBlock();
 		terminateSound = false;
-
-
-		while(soundClip.getFramePosition() == 0);
+		soundStream.start();
+		int bytesRead = -1;
+		byte b[] = new byte[4096];
 		try {
-			while(soundClip.isRunning() && !terminateSound) Thread.sleep(20);
+			while((bytesRead = soundStreamBuffer.read(b)) != -1 && !terminateSound)
+			{
+				soundStream.write(b, 0, bytesRead);
+				Thread.sleep(1);
+			}
 		}
+		catch (IOException e) {}
 		catch (InterruptedException ex) {}
-
+		if(!terminateSound)
+			soundStream.drain();
+		else
+			soundStream.flush();
 		stop();
-		if(playDialog != null && playDialog.isActive())
+		if(playDialog != null && playDialog.isVisible())
 			playDialog.dispose();
 	}
 	
 	public void stop()
 	{
-		if(soundClip != null)
+		if(soundStream != null)
 		{
-			if(soundClip.isRunning())
-				soundClip.stop();
+			soundStream.stop();
+			loadClip();
 		}
 	}
 
@@ -237,7 +263,6 @@ public class Track implements Runnable
 		this.fileName = fileName;
 		try
 		{
-			soundClip = AudioSystem.getClip();
 			loadStream();
 			loadClip();
 			isGood = true;
@@ -267,21 +292,15 @@ public class Track implements Runnable
 	public void setIntensity(double intensity)
 	{
 		this.intensity = intensity;
-		try {
-			if (soundClip!= null && dataStream!= null) {
-				if (!soundClip.isOpen()) {
-					soundClip.open(dataStream);
-				}
-				FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
-				float range = volumeMod.getMinimum();
-				range *= Math.pow(((100.0 - this.intensity) / 100.0), 2.2); //adjust curve of how much intensity affects volume
-				volumeMod.setValue(range);
-				tracklist.updateActionListeners();
-				dataStream.setAmplitudeLog(range);
-			}
+		if (soundStream != null && dataStream!= null)
+		{
+			FloatControl volumeMod = (FloatControl)soundStream.getControl(FloatControl.Type.MASTER_GAIN);
+			float range = volumeMod.getMinimum();
+			range *= Math.pow(((100.0 - this.intensity) / 100.0), 2.2); //adjust curve of how much intensity affects volume
+			volumeMod.setValue(range);
+			tracklist.updateActionListeners();
+			dataStream.setAmplitudeLog(range);
 		}
-		catch (LineUnavailableException e) {e.printStackTrace(); }
-		catch (IOException e) { e.printStackTrace();}
 	}
 	
 	public double getIntensity()
@@ -374,25 +393,19 @@ public class Track implements Runnable
 	{
 		try 
 		{
-			if (dataStream != null) {
-				if (!soundClip.isOpen()){
-						soundClip.open(dataStream);
-				}
-				FloatControl volumeMod = (FloatControl)soundClip.getControl(FloatControl.Type.MASTER_GAIN);
-				float range = volumeMod.getMinimum();
-				range *= ((100.0 - this.intensity) / 100.0);
-				volumeMod.setValue(range);
-			}
+			if(soundStreamBuffer != null)
+				soundStreamBuffer.close();
+			soundStreamBuffer = AudioSystem.getAudioInputStream(TrackList.getTrackListFormat(), AudioSystem.getAudioInputStream(new File(fileName)));
+			FloatControl volumeMod = (FloatControl)soundStream.getControl(FloatControl.Type.MASTER_GAIN);
+			float range = volumeMod.getMinimum();
+			range *= ((100.0 - this.intensity) / 100.0);
+			volumeMod.setValue(range);
 		} 
-		catch (LineUnavailableException e)
+		catch (IOException | UnsupportedAudioFileException e) 
 		{
-			e.printStackTrace();
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
+			isGood = false;
+			return;
 		}
-		soundClip.setFramePosition(0);
 	}
 	
 	public void loadStream() throws IOException, UnsupportedAudioFileException, Exception
@@ -407,11 +420,11 @@ public class Track implements Runnable
 	{
 		this.lengthInSamples = getSampleLength(s);
 		this.length = getLength(s, this.lengthInSamples);
-		if(s.getFormat().matches(tracklist.getTrackListFormat()))
+		if(s.getFormat().matches(TrackList.getTrackListFormat()))
 			return s;
-		if(AudioSystem.isConversionSupported(tracklist.getTrackListFormat(), s.getFormat()))
+		if(AudioSystem.isConversionSupported(TrackList.getTrackListFormat(), s.getFormat()))
 		{
-			AudioInputStream ret = AudioSystem.getAudioInputStream(tracklist.getTrackListFormat(), s);
+			AudioInputStream ret = AudioSystem.getAudioInputStream(TrackList.getTrackListFormat(), s);
 			return ret;
 		}
 		throw new Exception();
@@ -419,7 +432,7 @@ public class Track implements Runnable
 	
 	private double getLength(AudioInputStream s, long samples)
 	{
-		AudioFormat f = tracklist.getTrackListFormat();
+		AudioFormat f = TrackList.getTrackListFormat();
 		return ((double)samples / (double)f.getFrameRate());
 	}
 	
@@ -429,7 +442,7 @@ public class Track implements Runnable
 		if(s.getFormat().getSampleSizeInBits() == 32)//why????
 			frameLength /= 4;
 		double frameRate = (double) s.getFormat().getFrameRate();
-		double targetRate = (double) tracklist.getTrackListFormat().getFrameRate();
+		double targetRate = (double) TrackList.getTrackListFormat().getFrameRate();
 		double ret = (targetRate / frameRate) * frameLength;
 		return (long)ret;
 	}
